@@ -1,145 +1,247 @@
 "use client";
-import React, { useState } from "react";
-import { FaStar } from "react-icons/fa6";
+import React, { useState, useEffect } from "react";
+import Image from "next/image";
 
-const products = [
+
+const filterOrdersByDate = (orders, filter) => {
+  const now = new Date();
+  return orders.filter((order) => {
+    const orderDate = new Date(order.orderPlaced);
+    switch (filter) {
+      case "3_months":
+        return now - orderDate <= 3 * 30 * 24 * 60 * 60 * 1000; 
+      case "2024":
+        return orderDate.getFullYear() === 2024;
+      case "2023":
+        return orderDate.getFullYear() === 2023;
+      default:
+        return true;
+    }
+  });
+};
+
+const ProductPage = () => {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [dateFilter, setDateFilter] = useState("all"); 
+  const [filteredOrders, setFilteredOrders] = useState(orderData);
+
+  
+  useEffect(() => {
+    let filtered = orderData;
+
+   
+    filtered = filterOrdersByDate(filtered, dateFilter);
+
+    if (searchTerm) {
+      filtered = filtered.filter((order) =>
+        order.orderId.toString().includes(searchTerm)
+      );
+    }
+
+    setFilteredOrders(filtered);
+  }, [searchTerm, dateFilter]);
+  const getOrderCountMessage = () => {
+    const totalOrders = filteredOrders.length;
+
+    let timePeriod;
+    switch (dateFilter) {
+      case "3_months":
+        timePeriod = "the last 3 months";
+        break;
+      case "2024":
+        timePeriod = "2024";
+        break;
+      case "2023":
+        timePeriod = "2023";
+        break;
+      default:
+        timePeriod = "all time";
+    }
+
+    return (
+      <p className="font-bold text-md font-montserrat">
+        {totalOrders} {totalOrders === 1 ? "order" : "orders"}{" "}
+        <span>were placed in {timePeriod}</span>
+      </p>
+    );
+  };
+
+  return (
+    <div className="container mx-auto p-6 border-2 border-gray-200/80 mt-20 w-[70%] font-montserrat">
+      <h1 className="text-3xl font-bold mb-4">Your Orders</h1>
+      <div className="flex justify-between items-center mb-6">
+        <div className="relative">
+          <input
+            type="text"
+            placeholder="Search by Order ID"
+            className="border p-2 rounded-md w-64"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+          />
+          <span className="absolute right-2 top-3 text-gray-500">🔍</span>
+        </div>
+
+        <select
+          className="border p-2 rounded-md"
+          value={dateFilter}
+          onChange={(e) => setDateFilter(e.target.value)}
+        >
+          <option value="all">All Orders</option>
+          <option value="3_months">Last 3 months</option>
+          <option value="2024">2024</option>
+          <option value="2023">2023</option>
+        </select>
+      </div>
+      <div className="mb-4">
+        <p className="text-gray-700">{getOrderCountMessage()}</p>
+      </div>
+
+
+      {filteredOrders.length > 0 ? (
+        filteredOrders.map((order, index) => (
+          <div key={index} className="bg-white border rounded-lg shadow-md p-6 mb-4">
+            <div className="bg-gray-100 px-4 py-1 rounded-lg mb-4 flex justify-between items-center">
+              <p className="text-sm text-gray-600">
+                <strong>ORDER PLACED</strong> <br /> {order.orderPlaced}
+              </p>
+
+              <div className="flex items-center space-x-4">
+                <p className="text-sm text-gray-600">
+                  <strong>ORDER #</strong> <br /> {order.orderId}
+                </p>
+                <button className="bg-yellow-400 text-sm font-semibold text-black px-4 py-2 rounded-md hover:bg-yellow-500">
+                  Get Order Support
+                </button>
+              </div>
+            </div>
+
+            <div className={`overflow-y-auto ${order.products.length > 1 ? "h-48" : ""} pr-2`}>
+              <table className="w-full text-left border-collapse">
+                <thead>
+                  <tr className="border-b">
+                    <th className="pb-2">S.No</th>
+                    <th className="pb-2">Image</th>
+                    <th className="pb-2">Product Name</th>
+                    <th className="pb-2">Quantity</th>
+                    <th className="pb-2">Price</th>
+                    <th className="pb-2">Total</th>
+                    <th className="pb-2">Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {order.products.map((product, idx) => (
+                    <tr key={idx} className="border-b">
+                      <td className="py-4">{idx + 1}</td>
+                      <td className="py-4">
+                        <Image
+                          src={product.image}
+                          alt={product.name}
+                          width={80}
+                          height={80}
+                          className="rounded-lg"
+                        />
+                      </td>
+                      <td className="py-4">
+                        <h2 className="text-lg font-semibold text-blue-600 hover:underline">
+                          {product.name}
+                        </h2>
+                      </td>
+                      <td className="py-4">{product.quantity}</td>
+                      <td className="py-4">${product.price}</td>
+                      <td className="py-4">
+                        ${(product.quantity * product.price).toFixed(2)}
+                      </td>
+                      <td className="py-4">
+                        <button className="bg-blue-500 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-600">
+                          View Product
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            <div className="mt-6 bg-gray-100 px-4 py-1 rounded-lg flex justify-between">
+              <div className="text-sm">
+                <h3 className="font-bold">Price Breakdown:</h3>
+                <p>Original Price: ${order.originalPrice}</p>
+                <p>Discount: -${order.discount}</p>
+                <p>Coupons Applied: -${order.coupons}</p>
+                <p className="font-bold">Total: ${order.total}</p>
+              </div>
+
+         
+              <div className="text-sm">
+                <h3 className="font-bold">Shipping Address:</h3>
+                <p className="text-gray-700">{order.shippingAddress}</p>
+              </div>
+            </div>
+          </div>
+        ))
+      ) : (
+        <p>No orders found.</p>
+      )}
+    </div>
+  );
+};
+
+
+const orderData = [
   {
-    image:
-      "https://res.cloudinary.com/dduiqwdtr/image/upload/v1722336716/assets/AirSense10AutoSet.jpg",
-    title: "AirSense TM 10 AutoSet ™ with Heated Humidifier",
-    price: "999.00",
-    status: "Your item has been delivered",
-    date: "Apr 28",
+    orderId: 1728971862582,
+    orderPlaced: "2024-03-31",
+    originalPrice: 3500,
+    discount: 200,
+    coupons: 94,
+    total: 3206,
+    vendor_name: "3B Medical",
+    shippingAddress: "1234 Medical Drive, New York, NY 10001, USA",
+    products: [
+      {
+        name: "Luna II CPAP/Auto PAP",
+        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/luna_2_1728971862582.jpg",
+        quantity: 1,
+        price: 1100,
+      },
+      {
+        name: "CPAP Mask",
+        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/cpap_mask.jpg",
+        quantity: 2,
+        price: 300,
+      },
+      {
+        name: "CPAP Humidifier",
+        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/cpap_humidifier.jpg",
+        quantity: 1,
+        price: 500,
+      },
+    ],
   },
   {
-    image:
-      "https://res.cloudinary.com/dduiqwdtr/image/upload/v1722337327/assets/ResMedAirMini.png",
-    title: "AirSense™ 10 AutoSet ™ For Her is Discontinued",
-    price: "999.00",
-    status: "Your item has been delivered",
-    date: "Apr 28",
+    orderId: 1718984955073,
+    orderPlaced: "2024-02-27",
+    originalPrice: 5000,
+    discount: 300,
+    coupons: 194,
+    total: 4506,
+    vendor_name: "Bosch",
+    shippingAddress: "5678 Tool Lane, Chicago, IL 60607, USA",
+    products: [
+      {
+        name: "Bosch GSB 450-Watt Plastic Impact Drill",
+        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/OIP_1728971862582.o2UZ_HxK7X3QPpC3uaR-SAHaHa",
+        quantity: 1,
+        price: 2000,
+      },
+      {
+        name: "Bosch Drill Set",
+        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/drill_set.jpg",
+        quantity: 1,
+        price: 1000,
+      },
+    ],
   },
 ];
 
-const ProductCard = ({ image, title, price, status, date }) => {
-  return (
-    <div className="flex flex-col justify-evenly md:flex-row items-center p-5 bg-white rounded-lg mb-3 shadow-lg border border-gray-300">
-      <div className="image mb-3 md:mb-0">
-        <img
-          src={image}
-          alt={title}
-          className="w-36 h-auto md:mr-5 rounded-lg"
-        />
-      </div>
-      <div className="flex flex-col justify-center items-center md:items-start text-center md:text-left flex-grow md:flex-grow-0">
-        <p className="mb-2 w-[90%]">{title}</p>
-        <h4 className="text-xl font-bold">${price}</h4>
-      </div>
-      <div className="text-center md:text-right mt-3 md:mt-0">
-        <p className="text-black-500 font-bold text-lg">Delivered on {date}</p>
-        <p className="text-gray-500">{status}</p>
-        <a
-          href="#"
-          className="text-teal-400 no-underline mt-1 inline-flex items-center"
-        >
-          <FaStar className="mr-1 text-teal-600" /> Rate & Review Product
-        </a>
-      </div>
-    </div>
-  );
-};
-
-const Filters = () => {
-  return (
-    <div className="bg-gray-100 p-5 rounded-lg">
-      <h3 className="font-bold mb-3">Filters</h3>
-      <div className="mb-5">
-        <h4 className="mb-2 font-bold">ORDER STATUS</h4>
-        <div className="mb-2">
-          <input type="checkbox" id="on-the-way" />
-          <label htmlFor="on-the-way" className="ml-2">
-            On the way
-          </label>
-        </div>
-        <div className="mb-2">
-          <input type="checkbox" id="delivered" />
-          <label htmlFor="delivered" className="ml-2">
-            Delivered
-          </label>
-        </div>
-        <div className="mb-2">
-          <input type="checkbox" id="cancelled" />
-          <label htmlFor="cancelled" className="ml-2">
-            Cancelled
-          </label>
-        </div>
-        <div className="mb-2">
-          <input type="checkbox" id="returned" />
-          <label htmlFor="returned" className="ml-2">
-            Returned
-          </label>
-        </div>
-      </div>
-      <div className="mb-5">
-        <h4 className="mb-2 font-bold">ORDER TIME</h4>
-        <div className="mb-2">
-          <input type="checkbox" id="time-1" />
-          <label htmlFor="time-1" className="ml-2">
-            Time Option 1
-          </label>
-        </div>
-        <div className="mb-2">
-          <input type="checkbox" id="time-2" />
-          <label htmlFor="time-2" className="ml-2">
-            Time Option 2
-          </label>
-        </div>
-        <div className="mb-2">
-          <input type="checkbox" id="time-3" />
-          <label htmlFor="time-3" className="ml-2">
-            Time Option 3
-          </label>
-        </div>
-        <div className="mb-2">
-          <input type="checkbox" id="time-4" />
-          <label htmlFor="time-4" className="ml-2">
-            Time Option 4
-          </label>
-        </div>
-      </div>
-    </div>
-  );
-};
-
-export default function ProductsPage() {
-  const [showFilters, setShowFilters] = useState(false);
-
-  return (
-    <div className="container mx-auto p-5 bg-gray-50 rounded-lg shadow-lg mt-24">
-      <div className="md:hidden mb-5">
-        <button
-          onClick={() => setShowFilters(!showFilters)}
-          className="w-full bg-teal-600 text-white py-2 rounded-lg"
-        >
-          {showFilters ? "Hide Filters" : "Show Filters"}
-        </button>
-      </div>
-      <div className="flex flex-col md:flex-row">
-        <aside
-          className={`w-full md:w-1/5 mb-5 md:mb-0 pr-0 md:pr-5 ${
-            showFilters ? "block" : "hidden md:block"
-          }`}
-        >
-          <Filters />
-        </aside>
-        <main className="w-full md:w-4/5">
-          {products.map((product, index) => (
-            <div key={index} className="mb-5">
-              <ProductCard {...product} />
-            </div>
-          ))}
-        </main>
-      </div>
-    </div>
-  );
-}
+export default ProductPage;
