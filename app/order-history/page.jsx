@@ -1,15 +1,16 @@
 "use client";
 import React, { useState, useEffect } from "react";
 import Image from "next/image";
+import { useSession } from "next-auth/react";
 
 
 const filterOrdersByDate = (orders, filter) => {
   const now = new Date();
   return orders.filter((order) => {
-    const orderDate = new Date(order.orderPlaced);
+    const orderDate = new Date(order.order_date); 
     switch (filter) {
       case "3_months":
-        return now - orderDate <= 3 * 30 * 24 * 60 * 60 * 1000; 
+        return now - orderDate <= 3 * 30 * 24 * 60 * 60 * 1000;
       case "2024":
         return orderDate.getFullYear() === 2024;
       case "2023":
@@ -20,26 +21,58 @@ const filterOrdersByDate = (orders, filter) => {
   });
 };
 
+
+const SkeletonLoader = () => {
+  return (
+    <div className="animate-pulse">
+      <div className="bg-gray-200 h-6 w-3/4 mb-4 rounded"></div>
+      <div className="bg-gray-200 h-6 w-1/2 mb-4 rounded"></div>
+      <div className="bg-gray-200 h-24 mb-4 rounded"></div>
+    </div>
+  );
+};
+
 const ProductPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
-  const [dateFilter, setDateFilter] = useState("all"); 
-  const [filteredOrders, setFilteredOrders] = useState(orderData);
+  const [dateFilter, setDateFilter] = useState("all");
+  const [filteredOrders, setFilteredOrders] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
+  const [error, setError] = useState(null);
+  const { data: session } = useSession();
 
   
+
   useEffect(() => {
-    let filtered = orderData;
-
+    const fetchOrders = async () => {
+      try {
+        const response = await fetch(`http://localhost:3000/api/order/${session.user.email}`);
+        const data = await response.json();
+        setFilteredOrders(data); 
+        setIsLoading(false);
+      } catch (err) {
+        setError("Failed to load orders");
+        setIsLoading(false);
+      }
+    };
+    fetchOrders();
    
-    filtered = filterOrdersByDate(filtered, dateFilter);
+  }, []);
 
-    if (searchTerm) {
-      filtered = filtered.filter((order) =>
-        order.orderId.toString().includes(searchTerm)
-      );
+  // Filter the orders based on the search term and date filter
+  useEffect(() => {
+    if (!isLoading && filteredOrders) {
+      let filtered = filteredOrders;
+      filtered = filterOrdersByDate(filtered, dateFilter);
+
+      if (searchTerm) {
+        filtered = filtered.filter((order) =>
+          order.id.toString().includes(searchTerm)
+        );
+      }
+      setFilteredOrders(filtered);
     }
+  }, [searchTerm, dateFilter, filteredOrders, isLoading]);
 
-    setFilteredOrders(filtered);
-  }, [searchTerm, dateFilter]);
   const getOrderCountMessage = () => {
     const totalOrders = filteredOrders.length;
 
@@ -65,6 +98,25 @@ const ProductPage = () => {
       </p>
     );
   };
+
+  const handleViewProduct = (productId) => {
+  
+    window.location.href = `/product/${productId}`;
+  };
+
+  if (isLoading) {
+    return (
+      <div className="container mx-auto p-6 mt-20 w-[70%]">
+        <SkeletonLoader />
+        <SkeletonLoader />
+        <SkeletonLoader />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <p>{error}</p>;
+  }
 
   return (
     <div className="container mx-auto p-6 border-2 border-gray-200/80 mt-20 w-[70%] font-montserrat">
@@ -96,18 +148,17 @@ const ProductPage = () => {
         <p className="text-gray-700">{getOrderCountMessage()}</p>
       </div>
 
-
       {filteredOrders.length > 0 ? (
         filteredOrders.map((order, index) => (
           <div key={index} className="bg-white border rounded-lg shadow-md p-6 mb-4">
             <div className="bg-gray-100 px-4 py-1 rounded-lg mb-4 flex justify-between items-center">
               <p className="text-sm text-gray-600">
-                <strong>ORDER PLACED</strong> <br /> {order.orderPlaced}
+                <strong>ORDER PLACED</strong> <br /> {order.order_date}
               </p>
 
               <div className="flex items-center space-x-4">
                 <p className="text-sm text-gray-600">
-                  <strong>ORDER #</strong> <br /> {order.orderId}
+                  <strong>ORDER #</strong> <br /> {order.id}
                 </p>
                 <button className="bg-yellow-400 text-sm font-semibold text-black px-4 py-2 rounded-md hover:bg-yellow-500">
                   Get Order Support
@@ -115,7 +166,7 @@ const ProductPage = () => {
               </div>
             </div>
 
-            <div className={`overflow-y-auto ${order.products.length > 1 ? "h-48" : ""} pr-2`}>
+            <div className={`overflow-y-auto ${order.items.length > 1 ? "h-48" : ""} pr-2`}>
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b">
@@ -129,13 +180,13 @@ const ProductPage = () => {
                   </tr>
                 </thead>
                 <tbody>
-                  {order.products.map((product, idx) => (
+                  {order.items.map((product, idx) => (
                     <tr key={idx} className="border-b">
-                      <td className="py-4">{idx + 1}</td>
-                      <td className="py-4">
+                      <td className="py-2">{idx + 1}</td>
+                      <td className="py-2">
                         <Image
                           src={product.image}
-                          alt={product.name}
+                          alt={product.product_name}
                           width={80}
                           height={80}
                           className="rounded-lg"
@@ -143,7 +194,7 @@ const ProductPage = () => {
                       </td>
                       <td className="py-4">
                         <h2 className="text-lg font-semibold text-blue-600 hover:underline">
-                          {product.name}
+                          {product.product_name}
                         </h2>
                       </td>
                       <td className="py-4">{product.quantity}</td>
@@ -152,7 +203,10 @@ const ProductPage = () => {
                         ${(product.quantity * product.price).toFixed(2)}
                       </td>
                       <td className="py-4">
-                        <button className="bg-blue-500 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-600">
+                        <button
+                          className="bg-blue-500 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-600"
+                          onClick={() => handleViewProduct(product.product_id)} 
+                        >
                           View Product
                         </button>
                       </td>
@@ -165,16 +219,16 @@ const ProductPage = () => {
             <div className="mt-6 bg-gray-100 px-4 py-1 rounded-lg flex justify-between">
               <div className="text-sm">
                 <h3 className="font-bold">Price Breakdown:</h3>
-                <p>Original Price: ${order.originalPrice}</p>
-                <p>Discount: -${order.discount}</p>
-                <p>Coupons Applied: -${order.coupons}</p>
-                <p className="font-bold">Total: ${order.total}</p>
+                <p>Original Price: ${order.sub_amount}</p>
+                <p>Discount: -${order.discount_amount}</p>
+                <p className="font-bold">Total: ${order.total_amount}</p>
               </div>
 
-         
               <div className="text-sm">
                 <h3 className="font-bold">Shipping Address:</h3>
-                <p className="text-gray-700">{order.shippingAddress}</p>
+                <p className="text-gray-700">
+                  {order.shipping_address.line1}, {order.shipping_address.city}, {order.shipping_address.state}, {order.shipping_address.country} - {order.shipping_address.postal_code}
+                </p>
               </div>
             </div>
           </div>
@@ -185,63 +239,5 @@ const ProductPage = () => {
     </div>
   );
 };
-
-
-const orderData = [
-  {
-    orderId: 1728971862582,
-    orderPlaced: "2024-03-31",
-    originalPrice: 3500,
-    discount: 200,
-    coupons: 94,
-    total: 3206,
-    vendor_name: "3B Medical",
-    shippingAddress: "1234 Medical Drive, New York, NY 10001, USA",
-    products: [
-      {
-        name: "Luna II CPAP/Auto PAP",
-        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/luna_2_1728971862582.jpg",
-        quantity: 1,
-        price: 1100,
-      },
-      {
-        name: "CPAP Mask",
-        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/cpap_mask.jpg",
-        quantity: 2,
-        price: 300,
-      },
-      {
-        name: "CPAP Humidifier",
-        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/cpap_humidifier.jpg",
-        quantity: 1,
-        price: 500,
-      },
-    ],
-  },
-  {
-    orderId: 1718984955073,
-    orderPlaced: "2024-02-27",
-    originalPrice: 5000,
-    discount: 300,
-    coupons: 194,
-    total: 4506,
-    vendor_name: "Bosch",
-    shippingAddress: "5678 Tool Lane, Chicago, IL 60607, USA",
-    products: [
-      {
-        name: "Bosch GSB 450-Watt Plastic Impact Drill",
-        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/OIP_1728971862582.o2UZ_HxK7X3QPpC3uaR-SAHaHa",
-        quantity: 1,
-        price: 2000,
-      },
-      {
-        name: "Bosch Drill Set",
-        image: "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/product_images/drill_set.jpg",
-        quantity: 1,
-        price: 1000,
-      },
-    ],
-  },
-];
 
 export default ProductPage;
