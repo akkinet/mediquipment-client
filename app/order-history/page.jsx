@@ -3,11 +3,10 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 
-
 const filterOrdersByDate = (orders, filter) => {
   const now = new Date();
   return orders.filter((order) => {
-    const orderDate = new Date(order.order_date); 
+    const orderDate = new Date(order.order_date);
     switch (filter) {
       case "3_months":
         return now - orderDate <= 3 * 30 * 24 * 60 * 60 * 1000;
@@ -20,7 +19,6 @@ const filterOrdersByDate = (orders, filter) => {
     }
   });
 };
-
 
 const SkeletonLoader = () => {
   return (
@@ -35,19 +33,19 @@ const SkeletonLoader = () => {
 const ProductPage = () => {
   const [searchTerm, setSearchTerm] = useState("");
   const [dateFilter, setDateFilter] = useState("all");
+  const [allOrders, setAllOrders] = useState([]); // Store original orders
   const [filteredOrders, setFilteredOrders] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
   const { data: session } = useSession();
-
-  
 
   useEffect(() => {
     const fetchOrders = async () => {
       try {
         const response = await fetch(`http://localhost:3000/api/order/${session.user.email}`);
         const data = await response.json();
-        setFilteredOrders(data); 
+        setAllOrders(data); // Store the original orders
+        setFilteredOrders(data); // Initialize filtered orders
         setIsLoading(false);
       } catch (err) {
         setError("Failed to load orders");
@@ -55,23 +53,21 @@ const ProductPage = () => {
       }
     };
     fetchOrders();
-   
-  }, []);
+  }, [session]);
 
-  // Filter the orders based on the search term and date filter
+  // Apply filters whenever search term or date filter changes
   useEffect(() => {
-    if (!isLoading && filteredOrders) {
-      let filtered = filteredOrders;
-      filtered = filterOrdersByDate(filtered, dateFilter);
+    if (!isLoading && allOrders) {
+      let filtered = filterOrdersByDate(allOrders, dateFilter);
 
       if (searchTerm) {
         filtered = filtered.filter((order) =>
           order.id.toString().includes(searchTerm)
         );
       }
-      setFilteredOrders(filtered);
+      setFilteredOrders(filtered); // Update filtered orders
     }
-  }, [searchTerm, dateFilter, filteredOrders, isLoading]);
+  }, [searchTerm, dateFilter, allOrders, isLoading]);
 
   const getOrderCountMessage = () => {
     const totalOrders = filteredOrders.length;
@@ -100,7 +96,6 @@ const ProductPage = () => {
   };
 
   const handleViewProduct = (productId) => {
-  
     window.location.href = `/product/${productId}`;
   };
 
@@ -205,7 +200,7 @@ const ProductPage = () => {
                       <td className="py-4">
                         <button
                           className="bg-blue-500 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-600"
-                          onClick={() => handleViewProduct(product.product_id)} 
+                          onClick={() => handleViewProduct(product.product_id)}
                         >
                           View Product
                         </button>
