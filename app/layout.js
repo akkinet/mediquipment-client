@@ -4,6 +4,7 @@ import Navbar from "../components/Navbar";
 import ClientProvider from "../components/ClientProvider";
 import Footer from "../components/Footer";
 import { getServerSession } from "next-auth/next";
+import { authOptions } from "../lib/authOptions";
 import SessionProVider from "../components/SessionProVider";
 import DataProvider from "../components/server/DataProvider";
 
@@ -15,7 +16,7 @@ export const metadata = {
 };
 
 export default async function RootLayout({ children }) {
-  const session = await getServerSession();
+  const session = await getServerSession(authOptions);
   return (
     <>
       <html lang="en" className="">

@@ -4,9 +4,9 @@ import { CartContext } from '../SessionProVider'
 import { RiDeleteBin6Fill } from 'react-icons/ri'
 import PrescriptionModal from './PrescriptionModal'
  
-function Cart ({ isCartOpen }) {
+function Cart ({ isCartOpen, authSession }) {
   const myCart = typeof window !== 'undefined' && window.localStorage.getItem('medCart')
-  const authSession = typeof window !== 'undefined' && JSON.parse(window.localStorage.getItem('nextUser'))
+  // const authSession = typeof window !== 'undefined' && JSON.parse(window.localStorage.getItem('nextUser'))
   const [cartItems, setCartItems] = useContext(CartContext)
   const [isModalOpen, setIsModalOpen] = useState(false) // For modal
   let cart = myCart ? JSON.parse(myCart) : [];
@@ -15,7 +15,7 @@ function Cart ({ isCartOpen }) {
     cart = cart.filter(item => item.product_id != id)
  
     if (authSession) {
-      await fetch(`/api/cart/${authSession.email}?product_id=${id}`, {
+      await fetch(`/api/cart/${authSession.user.email}?product_id=${id}`, {
         method: 'DELETE'
       })
     }
@@ -112,7 +112,7 @@ function Cart ({ isCartOpen }) {
         cart={cart}
         isModalOpen={isModalOpen}
         setIsModalOpen={setIsModalOpen}
-        email={authSession?.email}
+        email={authSession?.user.email}
       />}
     </>
   )
