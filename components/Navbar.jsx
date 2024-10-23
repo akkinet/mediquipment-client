@@ -8,23 +8,23 @@ import { useSession, signOut } from "next-auth/react";
 import { FaArrowRight } from "react-icons/fa";
 import { GiHamburgerMenu } from "react-icons/gi";
 import { DataContext } from "./client/DataContextProvider";
-import Cart from './client/Cart'
+import Cart from "./client/Cart";
 import { CartContext } from "./SessionProVider";
 
 const Navbar = () => {
   const [active, setActive] = useState(null);
-  const { data: session, status } = useSession();
+  const { data: session } = useSession();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isProductsDropdownOpen, setIsProductsDropdownOpen] = useState(false);
   const [isSearchOpen, setIsSearchOpen] = useState(false);
   const [isUserCardOpen, setIsUserCardOpen] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState([]);
-  const [isCartOpen, setIsCartOpen] = useState(false)
+  const [isCartOpen, setIsCartOpen] = useState(false);
   const data = useContext(DataContext);
   const style = { color: "black" };
   const [cartItems, setCartItems] = useContext(CartContext);
-  
+
   const menuRef = useRef();
   const searchRef = useRef();
   const userCardRef = useRef();
@@ -44,11 +44,14 @@ const Navbar = () => {
     }
   };
 
+  console.log("navbar session", session);
+
   // Handle clicking outside the dropdown menus
   useEffect(() => {
-    const localCart = typeof window !== 'undefined' && window.localStorage.getItem("medCart");
+    const localCart =
+      typeof window !== "undefined" && window.localStorage.getItem("medCart");
     if (localCart) {
-        setCartItems(JSON.parse(localCart).length);
+      setCartItems(JSON.parse(localCart).length);
     }
 
     const handleClickOutside = (event) => {
@@ -61,7 +64,6 @@ const Navbar = () => {
       if (userCardRef.current && !userCardRef.current.contains(event.target)) {
         setIsUserCardOpen(false);
       }
-     
     };
 
     document.addEventListener("mousedown", handleClickOutside);
@@ -118,7 +120,7 @@ const Navbar = () => {
                       size={18}
                     />
                   </div>
-                </div>  
+                </div>
               </>
             </div>
           </MenuItem>
@@ -139,21 +141,21 @@ const Navbar = () => {
         </button>
 
         <button
-        onClick={() => setIsCartOpen(!isCartOpen)}
-        className="relative flex items-center text-black focus:outline-none"
-      >
-        <CiShoppingCart size={32} />
-        {cartItems > 0 && (
-          <span
-            className="absolute left-3 bottom-3 inline-flex items-center justify-center px-2 py-1 text-xs font-normal 
+          onClick={() => setIsCartOpen(!isCartOpen)}
+          className="relative flex items-center text-black focus:outline-none"
+        >
+          <CiShoppingCart size={32} />
+          {cartItems > 0 && (
+            <span
+              className="absolute left-3 bottom-3 inline-flex items-center justify-center px-2 py-1 text-xs font-normal 
               leading-none text-white bg-customBlue rounded-full"
-          >
-            {cartItems}
-          </span>
-        )}
-      </button>
+            >
+              {cartItems}
+            </span>
+          )}
+        </button>
 
-        {isCartOpen && <Cart isCartOpen={isCartOpen} />}
+        {isCartOpen && <Cart isCartOpen={isCartOpen} authSession={session} />}
         <div className="hidden md:block" ref={userCardRef}>
           {session && session.user ? (
             <div
@@ -200,9 +202,10 @@ const Navbar = () => {
                 Sign Out
               </button>
               <Link href="/order-history">
-                <button className="mt-2 w-full bg-customBlue focus-visible:bg-customBaseBlue text-white py-1 px-2 rounded">Order History</button>
+                <button className="mt-2 w-full bg-customBlue focus-visible:bg-customBaseBlue text-white py-1 px-2 rounded">
+                  Order History
+                </button>
               </Link>
-            
             </div>
           )}
         </div>
@@ -213,21 +216,21 @@ const Navbar = () => {
         </button>
 
         <button
-        onClick={() => setIsCartOpen(!isCartOpen)}
-        className="relative flex items-center text-black focus:outline-none"
-      >
-        <CiShoppingCart size={32} />
-        {cartItems > 0 && (
-          <span
-            className="absolute left-3 bottom-3 inline-flex items-center justify-center px-2 py-1 text-xs font-normal 
+          onClick={() => setIsCartOpen(!isCartOpen)}
+          className="relative flex items-center text-black focus:outline-none"
+        >
+          <CiShoppingCart size={32} />
+          {cartItems > 0 && (
+            <span
+              className="absolute left-3 bottom-3 inline-flex items-center justify-center px-2 py-1 text-xs font-normal 
               leading-none text-white bg-customBlue rounded-full"
-          >
-            {cartItems}
-          </span>
-        )}
-      </button>
+            >
+              {cartItems}
+            </span>
+          )}
+        </button>
 
-        {isCartOpen && <Cart isCartOpen={isCartOpen} />}
+        {isCartOpen && <Cart isCartOpen={isCartOpen} authSession={session} />}
 
         <GiHamburgerMenu
           style={style}
@@ -247,8 +250,7 @@ const Navbar = () => {
                 <button
                   onClick={() => setIsMobileMenuOpen(false)}
                   className="bg-white rounded-md p-2 inline-flex items-center justify-center text-gray-400 hover:text-gray-500 hover:bg-gray-100 focus:outline-none focus:ring-2 focus:ring-inset focus:ring-teal-500"
-                >
-                </button>
+                ></button>
               </div>
             </div>
             <div className="px-2 pt-2 pb-3 space-y-1">
