@@ -3,6 +3,11 @@ import React, { useState, useEffect } from "react";
 import Image from "next/image";
 import { useSession } from "next-auth/react";
 
+export const generateMetadata = () => {
+  return {
+      title: "Order History"
+  }
+}
 
 const filterOrdersByDate = (orders, filter) => {
   const now = new Date();
@@ -45,7 +50,7 @@ const ProductPage = () => {
   useEffect(() => {
     const fetchOrders = async () => {
       try {
-        const response = await fetch(`http://localhost:3000/api/order/${session.user.email}`);
+        const response = await fetch(`/api/order/${session.user.email}`);
         const data = await response.json();
         setFilteredOrders(data); 
         setIsLoading(false);

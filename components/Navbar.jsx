@@ -44,8 +44,6 @@ const Navbar = () => {
     }
   };
 
-  console.log("navbar session", session);
-
   // Handle clicking outside the dropdown menus
   useEffect(() => {
     const localCart =

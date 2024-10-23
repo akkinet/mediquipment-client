@@ -7,7 +7,7 @@ export const GET = async (req, ctx) => {
     const email = ctx.params.user;
     const params = {
       TableName: "Orders",
-      IndexName: "email-index",
+      IndexName: "sort-index",
       KeyConditionExpression: "customer_email = :email",
       ExpressionAttributeValues: {
         ":email": email,
