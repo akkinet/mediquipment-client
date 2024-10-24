@@ -62,7 +62,7 @@ const Login = () => {
         className="lg:hidden absolute inset-0 z-0 bg-cover bg-center"
         style={{ backgroundImage: "url('https://s3.ap-south-1.amazonaws.com/medicom.hexerve/login.png')" }}
       ></div>
-      <div className="relative p-8 mx-8 rounded-lg max-w-md w-full z-10 lg:mr-32 border-2 border-white shadow-xl shadow-teal-800/80 onject-center">
+      <div className="relative p-8 mx-8 rounded-lg max-w-md w-full z-10 lg:mr-32 border-2 border-white shadow-xl  onject-center">
         <h2 className="text-4xl font-bold mb-6 text-center text-white">
           Log in
         </h2>
@@ -106,12 +106,12 @@ const Login = () => {
           </div>
           <div>
             <input
-              className="bg-transparent hover:bg-teal-400 text-white hover:text-white font-bold py-2 px-4 rounded border border-white hover:border-transparent focus:outline-none focus:shadow-outline w-full"
+              className="bg-transparent hover:bg-customBlue text-white hover:text-white font-bold py-2 px-4 rounded border border-white hover:border-transparent focus:outline-none focus:shadow-outline w-full"
               type="submit"
               value="Log in"
             />
             <Link
-              className="inline-block align-baseline font-bold text-sm text-white hover:text-teal-600"
+              className="inline-block align-baseline font-bold text-sm text-white hover:text-customBlue"
               href="/password-forget"
             >
               Forgot Password?
@@ -155,7 +155,7 @@ const Login = () => {
 
         {/* Sign up link */}
         <div className="flex items-center justify-center mt-6">
-          <Link className="inline-block align-baseline font-bold text-sm text-white hover:text-teal-600" href="/sign-up">
+          <Link className="inline-block align-baseline font-bold text-sm text-white hover:text-customBlue" href="/sign-up">
             Need an account? SIGN UP
           </Link>
         </div>

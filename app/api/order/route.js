@@ -174,6 +174,7 @@ export const POST = async (req) => {
       <li>Shipping: 0</li>
       <li><strong>Total: ${orderParams.total_amount}</strong></li>
     </ul>
+    <p>you can view your order history by clicking on this <a href="http://localhost:3000/order-history">link<a/></p>
 
     <p class="mb-4">
       Thank you for your order! If you have any questions, please don't
