@@ -5,6 +5,8 @@
     "scripts": {
         "dev": "next dev",
         "build": "next build",
+        "webhook": "stripe listen --forward-to localhost:3000/api/stripe/webhook",
+        "socket": "node server.js",
         "start": "next start",
         "lint": "next lint"
     },
