@@ -6,28 +6,28 @@ const testimonials = [
   {
     rating: 4.5,
     text: 'This website made buying medical equipment effortless. The process was incredibly smooth, with a fast and simple checkout. Excellent service and high-quality.',
-    imgSrc: 'https://res.cloudinary.com/dduiqwdtr/image/upload/f_auto,q_auto/v1/profile/m84eiuum0pbwu1eodnsi',
+    imgSrc: 'https://s3.ap-south-1.amazonaws.com/medicom.hexerve/testimonials/shivamchokha.jpg',
     name: 'SHIVAM AWASTHI',
     role: 'Front end developer'
   },
   {
     rating: 4.9,
     text: 'Shopping for medical equipment here was fantastic! The site is easy to navigate, the checkout process was quick, and I received my order in no time. The quality of the products is exceptional.',
-    imgSrc: 'https://res.cloudinary.com/dduiqwdtr/image/upload/f_auto,q_auto/v1/profile/rgcqnyheqt3mbsr1yviw',
+    imgSrc: 'https://s3.ap-south-1.amazonaws.com/medicom.hexerve/testimonials/akash.jpg',
     name: 'AKASH SHARMA',
     role: 'Lead Developer'
   },
   {
     rating: 4.8,
     text: 'I had a fantastic experience with this website. The user-friendly design ensured a hassle-free shopping experience, and the quick delivery exceeded my expectations.',
-    imgSrc: 'https://res.cloudinary.com/dduiqwdtr/image/upload/f_auto,q_auto/v1/profile/whvo4h5sjdubo6jtdcwe',
+    imgSrc: 'https://s3.ap-south-1.amazonaws.com/medicom.hexerve/testimonials/kashish.jpg',
     name: 'KASHISH SAINI',
     role: 'WordPress Developer'
   },
   {
     rating: 4.1,
     text: 'Shopping for medical equipment here was fantastic! The site is easy to navigate, the checkout process was quick, and I received my order in no time. The quality of the products is exceptional.',
-    imgSrc: 'https://res.cloudinary.com/dduiqwdtr/image/upload/v1725365140/profile/jvynicl8xsi3tm1vwnf2.jpg',
+    imgSrc: 'https://s3.ap-south-1.amazonaws.com/medicom.hexerve/testimonials/akshay.jpg',
     name: 'AKSHAY BAIRWA',
     role: 'UI/UX Designer'
   }

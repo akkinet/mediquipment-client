@@ -60,13 +60,13 @@ const SignUpForm = () => {
   return (
     <div
       className="flex min-h-screen items-center justify-center lg:justify-end bg-cover bg-center overflow-hidden"
-      style={{ backgroundImage: "url('https://res.cloudinary.com/dduiqwdtr/image/upload/f_auto,q_auto/v1/assets/3.png')" }}
+      style={{ backgroundImage: "url('https://s3.ap-south-1.amazonaws.com/medicom.hexerve/33.png')" }}
     >
       {error && <Alert message={error} closeHandler={() => setError(null)} />}
       {/* Background image for mobiles */}
       <div
         className="lg:hidden absolute inset-0 z-0 bg-cover bg-center"
-        style={{ backgroundImage: "url('https://res.cloudinary.com/dduiqwdtr/image/upload/f_auto,q_auto/v1/assets/2.png')" }}
+        style={{ backgroundImage: "url('https://s3.ap-south-1.amazonaws.com/medicom.hexerve/login.png')" }}
       ></div>
       <div className="relative p-8 rounded-lg max-w-md w-full z-10 lg:mr-32 border-2 border-white shadow-xl shadow-teal-800/80 onject-center">
         <h2 className="text-4xl font-bold mb-6 text-white text-center">
