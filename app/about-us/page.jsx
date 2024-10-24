@@ -6,7 +6,7 @@ const AboutPage = () => {
       {/* Hero Section */}
       <div className="relative h-[450px] w-full">
         <Image
-          src="https://res.cloudinary.com/dduiqwdtr/image/upload/f_auto,q_auto/AboutPageHeroSection"
+          src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/Shutterstock%2B350925269.jpg"
           alt="About JKARE Hero"
           layout="fill"
           objectFit="cover"
@@ -75,7 +75,7 @@ const AboutPage = () => {
 
               <div className="md:w-1/3 mt-8 md:mt-0 flex justify-center">
                 <Image
-                  src="https://res.cloudinary.com/dduiqwdtr/image/upload/f_auto,q_auto/ACHC%20logo"
+                  src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/certificado12.jpg"
                   alt="ACHC Logo"
                   width={200}
                   height={200}

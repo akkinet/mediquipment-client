@@ -11,12 +11,6 @@ const nextConfig = {
       },
       {
         protocol: 'https', // or 'http' if needed
-        hostname: 'res.cloudinary.com', // Replace with your domain
-        port: '', // Optional, specify port if needed
-        pathname: '/**', // Optional, filter specific paths
-      },        // Add more patterns for other domains if necessary
-      {
-        protocol: 'https', // or 'http' if needed
         hostname: 'checkout.stripe.com', // Replace with your domain
         port: '', // Optional, specify port if needed
         pathname: '/**', // Optional, filter specific paths

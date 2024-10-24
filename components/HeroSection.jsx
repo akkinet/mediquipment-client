@@ -14,7 +14,7 @@ function HeroSection() {
           autoPlay
           loop
           muted
-          src="https://res.cloudinary.com/dduiqwdtr/video/upload/v1725960520/dmrmlr7f26wgbxxudmti.mp4"
+          src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/coverr-doctor-wearing-mask-2797-1080p.mp4"
         ></video>
       </div>
       <div className="absolute inset-0 w-full h-full bg-black opacity-25 z-10"></div>

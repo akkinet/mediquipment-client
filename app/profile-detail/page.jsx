@@ -13,7 +13,7 @@ const EditProfile = () => {
   const [address, setAddress] = useState(localUser ? localUser.address : null);
   const [profilePhoto, setProfilePhoto] = useState(
     localUser?.image ??
-      "https://res.cloudinary.com/dduiqwdtr/image/upload/f_auto,q_auto/x1qdn48t8aso6geuhwht"
+      "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/profilelogo.png"
   ); // Default profile photo
   const [file, setFile] = useState(null);
   const { data: session, update, status } = useSession();
