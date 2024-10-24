@@ -9,9 +9,10 @@ function OrderHistory({ orders }) {
   const [toDate, setToDate] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const ordersPerPage = 4;
+
   useEffect(() => {
     let sortedOrders = [...orders].sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
-   
+
     if (fromDate || toDate) {
       sortedOrders = sortedOrders.filter((order) => {
         const orderDate = new Date(order.order_date);
@@ -29,7 +30,7 @@ function OrderHistory({ orders }) {
       });
     }
 
- // adding filter by order id
+    // adding filter by order id
     if (searchTerm) {
       sortedOrders = sortedOrders.filter(order =>
         order.id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -55,6 +56,11 @@ function OrderHistory({ orders }) {
     const sortedOrders = [...orders].sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
     setFilteredOrders(sortedOrders);
     setCurrentPage(1);
+  };
+
+  // Function to handle view product (navigates to the product detail page using window.location.href)
+  const handleViewProduct = (productId) => {
+    window.location.href = `/product/${productId}`; // Navigate to the product detail page using the product ID
   };
 
   return (

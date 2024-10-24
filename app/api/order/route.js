@@ -12,7 +12,7 @@ const prescriptionUpload = async (file) => {
     const newFileName = `${file_name}_${new Date().getTime()}.${extension}`;
     const s3 = new S3Client();
     const params = {
-      Bucket: "medicom.hexerve", // Replace with your S3 bucket name
+      Bucket: "medicom.hexerve",
       Key: newFileName,
       Body: fileBuffer,
       ContentType: fileType,
