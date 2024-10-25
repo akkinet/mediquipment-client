@@ -1,64 +1,99 @@
-'use client';
+"use client";
 import Image from "next/image";
-import { useState, useEffect } from 'react';
+import { useState } from "react";
+import Alert from "../../components/ui/Alert";
 
-function OrderHistory({ orders }) {
-  const [searchTerm, setSearchTerm] = useState('');
-  const [filteredOrders, setFilteredOrders] = useState([]);
-  const [fromDate, setFromDate] = useState('');
-  const [toDate, setToDate] = useState('');
+function OrderHistory({ orders, email }) {
+  const [searchTerm, setSearchTerm] = useState("");
+  const [fromDate, setFromDate] = useState("");
+  const [toDate, setToDate] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
+  const [currentOrders, setCurrentOrders] = useState(orders);
+  const [errMsg, setErrMsg] = useState(null);
   const ordersPerPage = 4;
-  useEffect(() => {
-    let sortedOrders = [...orders].sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
-   
-    if (fromDate || toDate) {
-      sortedOrders = sortedOrders.filter((order) => {
-        const orderDate = new Date(order.order_date);
-        const from = fromDate ? new Date(fromDate) : null;
-        const to = toDate ? new Date(toDate) : null;
 
-        if (from && to) {
-          return orderDate >= from && orderDate <= to;
-        } else if (from) {
-          return orderDate >= from;
-        } else if (to) {
-          return orderDate <= to;
-        }
-        return true;
-      });
-    }
-
- // adding filter by order id
-    if (searchTerm) {
-      sortedOrders = sortedOrders.filter(order =>
-        order.id.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    setFilteredOrders(sortedOrders);
-  }, [orders, fromDate, toDate, searchTerm]);
-
-  // Handle pagination
+  //   // Handle pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
-  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
+  const orderList = currentOrders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const totalPages = Math.ceil(currentOrders.length / ordersPerPage);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
 
-  const handleResetDate = () => {
-    setFromDate('');
-    setToDate('');
-    const sortedOrders = [...orders].sort((a, b) => new Date(b.order_date) - new Date(a.order_date));
-    setFilteredOrders(sortedOrders);
+  function formatDate(date) {
+    const options = {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "numeric",
+      minute: "2-digit",
+      second: "2-digit",
+      hour12: true,
+    };
+
+    return new Intl.DateTimeFormat("en-US", options).format(date);
+  }
+
+  const handleResetDate = async () => {
+    setFromDate("");
+    setToDate("");
+    const res = await fetch(`/api/order/${email}`);
+    const myOrders = await res.json();
+    setCurrentOrders(myOrders);
+    setSearchTerm("");
     setCurrentPage(1);
+  };
+
+  const searchByID = async (value) => {
+    try {
+      let myOrders;
+      setSearchTerm(value);
+      if (value.length > 0) {
+        const res = await fetch(`/api/order/${email}?id=${value}`);
+        myOrders = await res.json();
+      } else {
+        const res = await fetch(`/api/order/${email}`);
+        myOrders = await res.json();
+      }
+      setCurrentOrders(myOrders);
+    } catch (error) {
+      setErrMsg(error);
+      setTimeout(() => setErrMsg(null), [3000]);
+    }
+  };
+
+  const searchByDate = async () => {
+    try {
+      if (fromDate == "" || toDate == "") {
+        setErrMsg("date must be selected!");
+        setTimeout(() => setErrMsg(null), [3000]);
+        return;
+      }
+
+      if (new Date(fromDate) > new Date(toDate)) {
+        setErrMsg("date must follow the order!");
+        setTimeout(() => setErrMsg(null), [3000]);
+        return;
+      }
+
+      const from = formatDate(new Date(fromDate));
+      const to = formatDate(new Date(toDate));
+      const res = await fetch(`/api/order/${email}?from=${from}&to=${to}`);
+      const myOrders = await res.json();
+      setCurrentOrders(myOrders);
+    } catch (error) {
+      setErrMsg(error);
+      setTimeout(() => setErrMsg(null), [3000]);
+    }
   };
 
   return (
     <div className="container mx-auto p-6 border-2 border-gray-200/80 mt-20 w-[70%] font-montserrat">
+      {errMsg && (
+        <Alert message={errMsg} closeHandler={() => setErrMsg(null)} />
+      )}
       <h1 className="text-3xl font-bold mb-4">Your Orders</h1>
 
       <div className="flex justify-between items-center mb-6">
@@ -68,7 +103,7 @@ function OrderHistory({ orders }) {
             placeholder="Search by Order ID"
             className="border p-2 rounded-md w-64"
             value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
+            onChange={(e) => searchByID(e.target.value)}
           />
           <span className="absolute right-2 top-3 text-gray-500">🔍</span>
         </div>
@@ -94,22 +129,33 @@ function OrderHistory({ orders }) {
               />
             </div>
             <div className="flex items-center">
-              <button 
-                className="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-red-600 mt-6" 
+              <button
+                className="bg-green-500 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-green-600 mt-6"
+                onClick={searchByDate}
+              >
+                search
+              </button>
+              <button
+                className="bg-red-500 text-white text-sm font-semibold ml-2 px-4 py-2 rounded-md hover:bg-red-600 mt-6"
                 onClick={handleResetDate}
               >
-                Reset Date
+                Reset
               </button>
             </div>
           </div>
         </div>
       </div>
 
-      <p className="mb-6 font-semibold">Showing {filteredOrders.length} orders</p>
+      <p className="mb-6 font-semibold">
+        Showing {currentOrders.length} orders
+      </p>
 
-      {currentOrders.length > 0 ? (
-        currentOrders.map((order, index) => (
-          <div key={index} className="bg-white border rounded-lg shadow-md p-6 mb-4">
+      {orderList.length > 0 ? (
+        orderList.map((order, index) => (
+          <div
+            key={index}
+            className="bg-white border rounded-lg shadow-md p-6 mb-4"
+          >
             <div className="bg-gray-100 px-4 py-1 rounded-lg mb-4 flex justify-between items-center">
               <p className="text-sm text-gray-600">
                 <strong>ORDER PLACED</strong> <br /> {order.order_date}
@@ -125,7 +171,11 @@ function OrderHistory({ orders }) {
               </div>
             </div>
 
-            <div className={`overflow-y-auto ${order.items.length > 1 ? "h-48" : ""} pr-2`}>
+            <div
+              className={`overflow-y-auto ${
+                order.items.length > 1 ? "h-48" : ""
+              } pr-2`}
+            >
               <table className="w-full text-left border-collapse">
                 <thead>
                   <tr className="border-b">
@@ -186,7 +236,10 @@ function OrderHistory({ orders }) {
               <div className="text-sm">
                 <h3 className="font-bold">Shipping Address:</h3>
                 <p className="text-gray-700">
-                  {order.shipping_address.line1}, {order.shipping_address.city}, {order.shipping_address.state}, {order.shipping_address.country} - {order.shipping_address.postal_code}
+                  {order.shipping_address.line1}, {order.shipping_address.city},{" "}
+                  {order.shipping_address.state},{" "}
+                  {order.shipping_address.country} -{" "}
+                  {order.shipping_address.postal_code}
                 </p>
               </div>
             </div>
@@ -201,21 +254,29 @@ function OrderHistory({ orders }) {
             height={300}
             className="mb-4"
           />
-          <p className="text-lg font-semibold text-gray-700">No orders were placed</p>
+          <p className="text-lg font-semibold text-gray-700">
+            No orders were placed
+          </p>
         </div>
       )}
 
       {/* Pagination */}
       <div className="flex justify-center mt-4">
-        {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
-          <button
-            key={pageNumber}
-            className={`mx-1 px-4 py-2 rounded-md ${currentPage === pageNumber ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-            onClick={() => handlePageChange(pageNumber)}
-          >
-            {pageNumber}
-          </button>
-        ))}
+        {Array.from({ length: totalPages }, (_, i) => i + 1).map(
+          (pageNumber) => (
+            <button
+              key={pageNumber}
+              className={`mx-1 px-4 py-2 rounded-md ${
+                currentPage === pageNumber
+                  ? "bg-blue-500 text-white"
+                  : "bg-gray-200"
+              }`}
+              onClick={() => handlePageChange(pageNumber)}
+            >
+              {pageNumber}
+            </button>
+          )
+        )}
       </div>
     </div>
   );

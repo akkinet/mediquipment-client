@@ -17,7 +17,7 @@ const fetchApi = async (email) => {
 const ProductPage = async () => {
   const session = await getServerSession(authOptions);
   const orders = await fetchApi(session.user.email);
-  return <OrderHistory orders={orders} />
+  return <OrderHistory orders={orders} email={session.user.email} />
 };
 
 export default ProductPage;
