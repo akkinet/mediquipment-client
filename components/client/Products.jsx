@@ -87,7 +87,7 @@ const Products = ({ productList, brands }) => {
   };
 
   return (
-    <div className='text-black mt-24 lg:flex lg:mx-20 '>
+    <div className='text-black mt-24 lg:flex lg:mx-20 font-montserrat'>
       <div className="leftcontainer lg:h-auto lg:w-1/4 p-4 mt-2 bg-gray-100 rounded-xl shadow-md ">
         <h1 className='text-4xl font-semibold mb-4 capitalize'></h1>
         <hr className='border-2 border-customBlue mb-2' />
@@ -224,7 +224,7 @@ const Products = ({ productList, brands }) => {
                   alt={prod.prod_name}
                 />
                 <div className="p-4 flex-grow flex flex-col items-center justify-between bg-gray-200 w-full">
-                  <h1 className="title-font text-md font-medium text-gray-900 text-center mb-1">
+                  <h1 className="title-font text-md font-medium text-gray-900 text-center mb-1 line-clamp-1">
                     {prod.prod_name}
                   </h1>
                   <p className='text-md text-center bg-customBlue text-white py-2 w-full rounded-lg shadow-sm'>$ {prod.prod_value}</p>
