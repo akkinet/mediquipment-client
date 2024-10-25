@@ -120,7 +120,7 @@ const ProductByCategoryPage = ({ productList, category, brandList }) => {
     <div className="rightcontainer lg:h-fit lg:w-3/4 lg:p-1 lg:pt-0 grid gap-4 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 animate-pulse">
       {[...Array(6)].map((_, i) => (
         <div className="p-2 flex flex-col" key={i}>
-          <div className="border shadow-xl shadow-teal-200/20 border-teal-200 rounded-lg overflow-hidden h-full flex flex-col items-center justify-between">
+          <div className="border shadow-xl  border-customBlue rounded-lg overflow-hidden h-full flex flex-col items-center justify-between">
             <div className="h-48 w-full bg-gray-300"></div>
             <div className="p-4 flex-grow flex flex-col items-center justify-between bg-gray-50 w-full">
               <div className="h-6 bg-gray-300 w-3/4 mb-2 rounded"></div>

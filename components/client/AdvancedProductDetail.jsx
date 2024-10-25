@@ -6,7 +6,6 @@ import { FaPlus, FaMinus, FaCaretLeft, FaCaretRight } from "react-icons/fa";
 import { useSession } from "next-auth/react";
 import { CartContext } from "../SessionProVider";
 import Link from "next/link";
-import Image from "next/image";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -80,7 +79,7 @@ const AdvancedProductDetail = ({ data }) => {
       } else {
         toast("Cart is full, no more items will be added", {
           position: "top-center",
-          autoClose: 2000,
+          autoClose: 3000,
           type: "error",
         });
         return;
@@ -152,7 +151,7 @@ const AdvancedProductDetail = ({ data }) => {
   const isOutOfStock = data.product.stockQuantity === 0;
 
   return (
-    <div className="container mx-auto p-6 lg:mt-14">
+    <div className="container mx-auto p-6 lg:mt-14 font-montserrat">
       <div className="flex flex-col md:flex-row lg:mt-8 md: mt-16 space-y-6 md:space-y-0 md:space-x-6 lg:px-20">
         <div className="flex flex-col items-center md:w-1/2 lg:sticky top-24 h-fit">
           <div className="lg:w-[30rem] lg:h-[30rem] sm: h-64 sm: w-96 overflow-hidden rounded-lg border-2 border-customBlue shadow-lg">
