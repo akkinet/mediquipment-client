@@ -20,7 +20,7 @@ function HeroSection() {
       <div className="absolute inset-0 w-full h-full bg-black opacity-25 z-10"></div>
 
       {/* Text Element */}
-      <div className="relative z-20 text-center px-4 py-6 lg:px-10 lg:py-8">
+      <div className="relative z-20 text-center px-4 py-6 lg:px-10 lg:py-8 font-montserrat">
         <h1 className="text-3xl md:text-5xl lg:text-6xl font-bold text-white leading-tight lg:leading-snug max-w-6xl mx-auto ">
           Perfect Medical Equipment From Your Favourite Brand
         </h1>

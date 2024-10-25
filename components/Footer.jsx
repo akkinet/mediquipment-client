@@ -16,9 +16,9 @@ const Footer = () => {
               <img className="lg:w-[50%] w-[20%]" src="https://images.squarespace-cdn.com/content/v1/60aefe75c1a8f258e529fbac/1622081456984-G5MG4OZZJFVIM3R01YN7/jkare-2.png?format=1500w" alt="" />
             </div>
             <nav className="list-none mb-10">
-              <li className="text-white hover:text-pink-500 cursor-pointer">Call Us: 305-266-6701</li>
-              <li className="text-white hover:text-pink-500 cursor-pointer">Toll Free: 855-717-7378</li>
-              <li className="text-white hover:text-pink-500 cursor-pointer">info@hexerve.com</li>
+              <li className="text-white cursor-pointer">Call Us: 305-266-6701</li>
+              <li className="text-white cursor-pointer">Toll Free: 855-717-7378</li>
+              <li className="text-white cursor-pointer">info@hexerve.com</li>
             </nav>
           </div>
 

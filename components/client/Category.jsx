@@ -17,7 +17,7 @@ const Category = ({ category }) => {
         </div> 
     )
     return (
-        <div className='text-black mt-24 lg:flex lg:justify-center lg:mx-20'>
+        <div className='text-black mt-24 lg:flex lg:justify-center lg:mx-20 font-montserrat'>
             {category.length == 0 ? (
                 renderSkeletonProducts()
             ) : (
@@ -35,7 +35,7 @@ const Category = ({ category }) => {
                                             />
                                         </div>
                                         <div className='p-4 flex-grow flex flex-col items-center justify-between bg-customBlue w-full'>
-                                            <h1 className='title-font text-md font-medium text-white text-center'>
+                                            <h1 className='title-font text-md font-medium text-white text-center line-clamp-1'>
                                                 {cat.name}
                                             </h1>
                                         </div>
