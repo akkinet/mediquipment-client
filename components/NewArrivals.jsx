@@ -105,14 +105,14 @@ const NewArrivals = async () => {
               </div>
             </div>
           </section>
-          <section className="text-gray-800 body-font  flex flex-col lg:px-16  lg:py-10  max-w-sm:py-0 ">
+          <section className="text-gray-800 body-font  flex flex-col lg:px-16  lg:py-10  max-w-sm:py-0 font-montserrat">
             <div className="upper-container lg:flex max-w-sm:flex-col-reverse ">
               <div className="container rounded-2xl lg:my-0 mx-auto max-w-sm: my-6 flex p-5 md:flex-row flex-col items-center lg:w-[55%]  bg-customPink hover:shadow-xl hover:shadow-customPink/30">
                 <div className="lg:h-[100%]  text-white lg:flex-grow md:w-full lg:pr-5 md:pr-16 flex flex-col justify-evenly md:items-start md:text-left max-w-sm: mb-0 md:mb-0 items-center text-center ">
                   <h1 className="title-font sm:text-4xl text-3xl mb-4 font-bold">
                     Free Shipping
                   </h1>
-                  <p className="mb-8 leading-relaxed font-bold text-xl">
+                  <p className="mb-3 leading-relaxed font-bold text-lg">
                     Enjoy free shipping on all orders with no minimum purchase
                     required. Shop now and save on top-quality medical
                     equipment!
@@ -124,7 +124,7 @@ const NewArrivals = async () => {
                   <h1 className="title-font sm:text-4xl text-3xl mb-4 font-bold">
                     24X7 Support
                   </h1>
-                  <p className="mb-8 leading-relaxed font-bold text-xl">
+                  <p className="mb-3 leading-relaxed font-bold text-lg">
                     Benefit from our 24/7 support, ensuring you receive
                     assistance anytime.
                   </p>

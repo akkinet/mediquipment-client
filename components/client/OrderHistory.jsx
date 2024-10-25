@@ -77,8 +77,8 @@ function OrderHistory({ orders }) {
         </div>
 
         <div className="flex flex-col md:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full md:w-auto">
-          <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full">
-            <div className="w-full">
+          <div className="flex flex-col sm:flex-row  space-y-4 sm:space-y-0 sm:space-x-4 w-full items-end">
+            <div className="w-full ">
               <label className="block text-xs sm:text-sm mb-2">From Date</label>
               <input
                 type="date"
@@ -96,12 +96,14 @@ function OrderHistory({ orders }) {
                 onChange={(e) => setToDate(e.target.value)}
               />
             </div>
+            <div className="w-full">
             <button
               className="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-red-600 w-full md:w-auto"
               onClick={handleResetDate}
             >
               Reset Date
             </button>
+            </div>
           </div>
         </div>
       </div>

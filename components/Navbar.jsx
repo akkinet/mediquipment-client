@@ -85,7 +85,7 @@ const Navbar = () => {
   // }
 
   return (
-    <div className="fixed top-0 inset-x-0 max-w-full mx-auto z-50 flex items-center justify-between bg-stone-200/90 backdrop-blur-md lg:px-8 py-2 ">
+    <div className="fixed top-0 inset-x-0 max-w-full mx-auto z-50 flex items-center justify-between bg-stone-200/90 backdrop-blur-md lg:px-8 py-2  ">
       <div className="flex items-center sm: pl-4">
         <img
           className="lg:h-14 max-w-sm: h-9 lg:py-2"
