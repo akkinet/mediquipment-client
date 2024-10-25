@@ -234,7 +234,7 @@ const Products = ({ productList, brands }) => {
           </div>
         )) : (
           <div className="text-center lg:w-[60vw] lg:h-[50vh] mt-5 flex items-center justify-center animate-pulse">
-            <Image src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/data-search-not-found-concept-vector-36073021.jpg" height={600} width={500} />
+            <Image src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/data-search-not-found-concept-vector-36073021_1-removebg-preview.png" height={600} width={500} />
           </div>
         )}
       </div>

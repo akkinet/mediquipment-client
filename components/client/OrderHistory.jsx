@@ -30,7 +30,6 @@ function OrderHistory({ orders }) {
       });
     }
 
-    // adding filter by order id
     if (searchTerm) {
       sortedOrders = sortedOrders.filter(order =>
         order.id.toLowerCase().includes(searchTerm.toLowerCase())
@@ -40,7 +39,6 @@ function OrderHistory({ orders }) {
     setFilteredOrders(sortedOrders);
   }, [orders, fromDate, toDate, searchTerm]);
 
-  // Handle pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
@@ -58,81 +56,75 @@ function OrderHistory({ orders }) {
     setCurrentPage(1);
   };
 
-  // Function to handle view product (navigates to the product detail page using window.location.href)
   const handleViewProduct = (productId) => {
-    window.location.href = `/product/${productId}`; // Navigate to the product detail page using the product ID
+    window.location.href = `/product/${productId}`;
   };
 
   return (
-    <div className="container mx-auto p-6 border-2 border-gray-200/80 mt-20 w-[70%] font-montserrat">
-      <h1 className="text-3xl font-bold mb-4">Your Orders</h1>
+    <div className="container mx-auto p-4 sm:p-6 border-2 border-gray-200/80 mt-10 md:mt-20 w-full md:w-[90%] lg:w-[70%] font-montserrat">
+      <h1 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4 text-center md:text-left">Your Orders</h1>
 
-      <div className="flex justify-between items-center mb-6">
-        <div className="relative">
+      <div className="flex flex-col md:flex-row md:justify-between items-start md:items-center mb-6 space-y-4 md:space-y-0 w-full">
+        <div className="relative w-full md:w-auto">
           <input
             type="text"
             placeholder="Search by Order ID"
-            className="border p-2 rounded-md w-64"
+            className="border p-2 rounded-md w-full sm:w-64"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
           />
-          <span className="absolute right-2 top-3 text-gray-500">🔍</span>
+          <span className="absolute right-3 top-3 text-gray-500">🔍</span>
         </div>
 
-        <div className="flex items-center space-x-4">
-          <div className="flex items-center space-x-4">
-            <div>
-              <label className="block mb-2">From Date</label>
+        <div className="flex flex-col md:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full md:w-auto">
+          <div className="flex flex-col sm:flex-row items-center space-y-4 sm:space-y-0 sm:space-x-4 w-full">
+            <div className="w-full">
+              <label className="block text-xs sm:text-sm mb-2">From Date</label>
               <input
                 type="date"
-                className="border p-2 rounded-md"
+                className="border p-2 rounded-md w-full"
                 value={fromDate}
                 onChange={(e) => setFromDate(e.target.value)}
               />
             </div>
-            <div>
-              <label className="block mb-2">To Date</label>
+            <div className="w-full">
+              <label className="block text-xs sm:text-sm mb-2">To Date</label>
               <input
                 type="date"
-                className="border p-2 rounded-md"
+                className="border p-2 rounded-md w-full"
                 value={toDate}
                 onChange={(e) => setToDate(e.target.value)}
               />
             </div>
-            <div className="flex items-center">
-              <button 
-                className="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-red-600 mt-6" 
-                onClick={handleResetDate}
-              >
-                Reset Date
-              </button>
-            </div>
+            <button
+              className="bg-red-500 text-white text-sm font-semibold px-4 py-2 rounded-md hover:bg-red-600 w-full md:w-auto"
+              onClick={handleResetDate}
+            >
+              Reset Date
+            </button>
           </div>
         </div>
       </div>
 
-      <p className="mb-6 font-semibold">Showing {filteredOrders.length} orders</p>
+      <p className="mb-6 font-semibold text-center md:text-left">Showing {filteredOrders.length} orders</p>
 
       {currentOrders.length > 0 ? (
         currentOrders.map((order, index) => (
-          <div key={index} className="bg-white border rounded-lg shadow-md p-6 mb-4">
-            <div className="bg-gray-100 px-4 py-1 rounded-lg mb-4 flex justify-between items-center">
+          <div key={index} className="bg-white border rounded-lg shadow-md p-4 sm:p-6 mb-4">
+            <div className="bg-gray-100 px-4 py-2 rounded-lg mb-4 flex lg:flex-row  sm: flex-col justify-between items-start sm:items-center space-y-2 sm:space-y-0">
               <p className="text-sm text-gray-600">
+                <strong>ORDER ID #</strong> <br /> {order.id}
+              </p>
+              <p className="text-sm text-gray-600 ">
                 <strong>ORDER PLACED</strong> <br /> {order.order_date}
               </p>
-
-              <div className="flex items-center space-x-4">
-                <p className="text-sm text-gray-600">
-                  <strong>ORDER ID #</strong> <br /> {order.id}
-                </p>
-                <button className="bg-yellow-400 text-sm font-semibold text-black px-4 py-2 rounded-md hover:bg-yellow-500">
+                <button className="bg-yellow-400 text-sm font-semibold text-black px-4 py-2 rounded-md hover:bg-yellow-500 w-full sm:w-auto">
                   Get Order Support
                 </button>
-              </div>
             </div>
 
             <div className={`overflow-y-auto ${order.items.length > 1 ? "h-48" : ""} pr-2`}>
-              <table className="w-full text-left border-collapse">
+              <table className="w-full text-left border-collapse text-xs sm:text-sm lg:text-base">
                 <thead>
                   <tr className="border-b">
                     <th className="pb-2">S.No</th>
@@ -152,24 +144,24 @@ function OrderHistory({ orders }) {
                         <Image
                           src={product.image}
                           alt={product.product_name}
-                          width={80}
-                          height={80}
+                          width={50}
+                          height={50}
                           className="rounded-lg"
                         />
                       </td>
-                      <td className="py-4">
-                        <h2 className="text-md font-semibold text-black hover:underline">
+                      <td className="py-2 sm:py-4">
+                        <h2 className="text-xs sm:text-sm lg:text-md font-semibold text-black hover:underline">
                           {product.product_name}
                         </h2>
                       </td>
-                      <td className="py-4 text-center">{product.quantity}</td>
-                      <td className="py-4">${product.price}</td>
-                      <td className="py-4">
+                      <td className="py-2 sm:py-4 text-center">{product.quantity}</td>
+                      <td className="py-2 sm:py-4">${product.price}</td>
+                      <td className="py-2 sm:py-4">
                         ${(product.quantity * product.price).toFixed(2)}
                       </td>
-                      <td className="py-4">
+                      <td className="py-2 sm:py-4">
                         <button
-                          className="bg-blue-500 text-white text-sm px-4 py-2 rounded-md hover:bg-blue-600"
+                          className="bg-blue-500 text-white text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-2 rounded-md hover:bg-blue-600"
                           onClick={() => handleViewProduct(product.product_id)}
                         >
                           View Product
@@ -181,15 +173,15 @@ function OrderHistory({ orders }) {
               </table>
             </div>
 
-            <div className="mt-6 bg-gray-100 px-4 py-1 rounded-lg flex justify-between">
-              <div className="text-sm">
+            <div className="mt-4 bg-gray-100 px-4 py-2 rounded-lg flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-2 sm:space-y-0 text-xs sm:text-sm">
+              <div>
                 <h3 className="font-bold">Price Breakdown:</h3>
                 <p>Original Price: ${order.sub_amount}</p>
                 <p>Discount: -${order.discount_amount}</p>
                 <p className="font-bold">Total: ${order.total_amount}</p>
               </div>
 
-              <div className="text-sm">
+              <div>
                 <h3 className="font-bold">Shipping Address:</h3>
                 <p className="text-gray-700">
                   {order.shipping_address.line1}, {order.shipping_address.city}, {order.shipping_address.state}, {order.shipping_address.country} - {order.shipping_address.postal_code}
@@ -203,20 +195,19 @@ function OrderHistory({ orders }) {
           <Image
             src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/removing-goods-from-basket-refusing-purchase-changing-decision-item-deletion-emptying-trash-online-shopping-app-laptop-user-cartoon-character_335657-1172.avif"
             alt="No orders"
-            width={300}
-            height={300}
+            width={150}
+            height={150}
             className="mb-4"
           />
-          <p className="text-lg font-semibold text-gray-700">No orders were placed</p>
+          <p className="text-sm sm:text-lg font-semibold text-gray-700 text-center">No orders were placed</p>
         </div>
       )}
 
-      {/* Pagination */}
       <div className="flex justify-center mt-4">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map(pageNumber => (
           <button
             key={pageNumber}
-            className={`mx-1 px-4 py-2 rounded-md ${currentPage === pageNumber ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            className={`mx-1 px-2 py-1 sm:px-3 sm:py-2 rounded-md ${currentPage === pageNumber ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
             onClick={() => handlePageChange(pageNumber)}
           >
             {pageNumber}

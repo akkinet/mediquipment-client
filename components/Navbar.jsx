@@ -337,6 +337,11 @@ const Navbar = () => {
                   >
                     Sign Out
                   </button>
+                  <Link href="/order-history">
+                <button className="mt-2 w-full bg-customBlue focus-visible:bg-customBaseBlue text-white py-1 px-2 rounded">
+                  Order History
+                </button>
+              </Link>
                 </div>
               ) : (
                 <Link href="/login">

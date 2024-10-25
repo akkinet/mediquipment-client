@@ -20,7 +20,7 @@ const testimonials = [
   {
     rating: 4.8,
     text: 'I had a fantastic experience with this website. The user-friendly design ensured a hassle-free shopping experience, and the quick delivery exceeded my expectations.',
-    imgSrc: 'https://s3.ap-south-1.amazonaws.com/medicom.hexerve/testimonials/kashish.jpg',
+    imgSrc: 'https://s3.ap-south-1.amazonaws.com/medicom.hexerve/WhatsApp+Image+2024-10-25+at+10.38.41_488a5962.jpg',
     name: 'KASHISH SAINI',
     role: 'WordPress Developer'
   },
