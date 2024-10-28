@@ -3,7 +3,7 @@ import Link from 'next/link'
 
 const Category = ({ category }) => {
     const renderSkeletonProducts = () => (
-        <div className='rightcontainer lg:h-fit lg:min-w-[90%] lg:p-1 lg:pt-0 grid gap-4 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4 animate-pulse'>
+        <div className='rightcontainer lg:h-fit lg:min-w-[90%] lg:p-1 lg:pt-0 grid gap-4 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-4'>
             {[...Array(8)].map((_, i) => (
                 <div className='p-2 flex flex-col' key={i}>
                     <div className='border shadow-xl shadow-teal-200/20 border-teal-200 rounded-lg overflow-hidden h-full flex flex-col items-center justify-between'>
