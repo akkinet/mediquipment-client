@@ -8,7 +8,7 @@ import { CartContext } from "../SessionProVider";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-
+ 
 const AdvancedProductDetail = ({ data }) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -16,15 +16,15 @@ const AdvancedProductDetail = ({ data }) => {
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
   const [, setCartItems] = useContext(CartContext);
   const { data: session } = useSession();
-
+ 
   const handleImageClick = () => {
     setIsModalOpen(true);
   };
-
+ 
   const handleThumbnailClick = (index) => {
     setSelectedImage(index);
   };
-
+ 
   const handleQuantityChange = (action) => {
     if (action === "increase") {
       setQuantity(quantity + 1);
@@ -32,27 +32,27 @@ const AdvancedProductDetail = ({ data }) => {
       setQuantity(quantity - 1);
     }
   };
-
+ 
   async function addToCart(product) {
     await fetch("/api/cart", {
       method: "POST",
       body: JSON.stringify(product),
     });
   }
-
+ 
   async function upToDateCart(product) {
     await fetch(`/api/cart/${product.email}?product_id=${product.product_id}`, {
       method: "PUT",
       body: JSON.stringify(product),
     });
   }
-
+ 
   const cartHandler = () => {
     if (data.product.stockQuantity === 0) {
       // Disable adding to cart if out of stock
       return;
     }
-
+ 
     let cart = [];
     const medCart =
       typeof window !== "undefined" && window.localStorage.getItem("medCart");
@@ -66,10 +66,10 @@ const AdvancedProductDetail = ({ data }) => {
       price: data.product.prod_value,
       stockQuantity: data.product.stockQuantity,
     };
-
+ 
     if (medCart) {
       const localCart = JSON.parse(medCart);
-
+ 
       if (localCart.length < 10) {
         toast("Item added successfully", {
           position: "top-center",
@@ -84,7 +84,7 @@ const AdvancedProductDetail = ({ data }) => {
         });
         return;
       }
-
+ 
       const exist = localCart.find((c) => c.product_id == data.product.prod_id);
       if (exist) {
         cart = localCart.map((c) => {
@@ -131,30 +131,30 @@ const AdvancedProductDetail = ({ data }) => {
       }
       cart.push(newProduct);
     }
-
+ 
     setCartItems(cart.length);
     window.localStorage.setItem("medCart", JSON.stringify(cart));
   };
-
+ 
   const handleLeftArrowClick = () => {
     if (thumbnailIndex > 0) {
       setThumbnailIndex(thumbnailIndex - 1);
     }
   };
-
+ 
   const handleRightArrowClick = () => {
     if (thumbnailIndex < data?.product.prod_images.length - 4) {
       setThumbnailIndex(thumbnailIndex + 1);
     }
   };
-
+ 
   const isOutOfStock = data.product.stockQuantity === 0;
-
+ 
   return (
     <div className="container mx-auto p-6 lg:mt-14 font-montserrat">
-      <div className="flex flex-col md:flex-row lg:mt-8 md: mt-16 sm:flex-col space-y-6 md:space-y-0 md:space-x-6 lg:px-20 ">
-        <div className="flex flex-col items-center md:w-1/2 lg:sticky top-24 h-fit ">
-          <div className="lg:w-[80%] lg:h-[80%] sm: h-64 sm: w-96 overflow-hidden rounded-lg border-2 border-customBlue shadow-lg">
+      <div className="flex flex-col md:flex-row lg:mt-8 md: mt-16 space-y-6 md:space-y-0 md:space-x-6 lg:px-20">
+        <div className="flex flex-col items-center md:w-1/2 lg:sticky top-24 h-fit">
+          <div className="lg:w-[30rem] lg:h-[30rem] sm: h-64 sm: w-96 overflow-hidden rounded-lg border-2 border-customBlue shadow-lg">
             <img
               src={data?.product.prod_images[selectedImage]}
               alt="Product"
@@ -194,7 +194,7 @@ const AdvancedProductDetail = ({ data }) => {
             </button>
           </div>
         </div>
-        <div className="md:w-1/2 ">
+        <div className="md:w-1/2">
           <h2 className="text-gray-600 uppercase">{data.product.brand_name}</h2>
           <h2 className="text-2xl font-bold">{data.product.prod_name}</h2>
           <div className="flex items-center justify-between lg:w-1/2 my-1">
@@ -334,7 +334,7 @@ const AdvancedProductDetail = ({ data }) => {
             <p className="text-2xl font-bold my-2">Product Description:</p>
             <div>
               <p>{data.product.prod_desc}</p>
-              <ul className=" pl-4 list-decimal">
+              <ul className="list-decimal">
                 {data.product.prod_detailed_desc.map((dtl, i) => (
                   <li key={i}>
                     <p className="my-2 text-xl font-bold ml-2">
@@ -400,5 +400,5 @@ const AdvancedProductDetail = ({ data }) => {
     </div>
   );
 };
-
+ 
 export default AdvancedProductDetail;
