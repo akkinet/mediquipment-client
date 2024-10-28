@@ -152,9 +152,9 @@ const AdvancedProductDetail = ({ data }) => {
 
   return (
     <div className="container mx-auto p-6 lg:mt-14 font-montserrat">
-      <div className="flex flex-col md:flex-row lg:mt-8 md: mt-16 space-y-6 md:space-y-0 md:space-x-6 lg:px-20">
-        <div className="flex flex-col items-center md:w-1/2 lg:sticky top-24 h-fit">
-          <div className="lg:w-[30rem] lg:h-[30rem] sm: h-64 sm: w-96 overflow-hidden rounded-lg border-2 border-customBlue shadow-lg">
+      <div className="flex flex-col md:flex-row lg:mt-8 md: mt-16 sm:flex-col space-y-6 md:space-y-0 md:space-x-6 lg:px-20 ">
+        <div className="flex flex-col items-center md:w-1/2 lg:sticky top-24 h-fit ">
+          <div className="lg:w-[80%] lg:h-[80%] sm: h-64 sm: w-96 overflow-hidden rounded-lg border-2 border-customBlue shadow-lg">
             <img
               src={data?.product.prod_images[selectedImage]}
               alt="Product"
@@ -194,7 +194,7 @@ const AdvancedProductDetail = ({ data }) => {
             </button>
           </div>
         </div>
-        <div className="md:w-1/2">
+        <div className="md:w-1/2 ">
           <h2 className="text-gray-600 uppercase">{data.product.brand_name}</h2>
           <h2 className="text-2xl font-bold">{data.product.prod_name}</h2>
           <div className="flex items-center justify-between lg:w-1/2 my-1">
@@ -334,7 +334,7 @@ const AdvancedProductDetail = ({ data }) => {
             <p className="text-2xl font-bold my-2">Product Description:</p>
             <div>
               <p>{data.product.prod_desc}</p>
-              <ul className="list-decimal">
+              <ul className=" pl-4 list-decimal">
                 {data.product.prod_detailed_desc.map((dtl, i) => (
                   <li key={i}>
                     <p className="my-2 text-xl font-bold ml-2">
