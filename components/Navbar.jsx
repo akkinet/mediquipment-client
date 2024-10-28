@@ -80,9 +80,6 @@ const Navbar = () => {
     setIsMobileMenuOpen(false);
   };
 
-  // if (status === "loading") {
-  //   return <p>Loading...</p>;
-  // }
 
   return (
     <div className="fixed top-0 inset-x-0 max-w-full mx-auto z-50 flex items-center justify-between bg-stone-200/90 backdrop-blur-md lg:px-8 py-2  ">
