@@ -23,11 +23,11 @@ export function Button({
   return (
     <Component
       className={cn(
-        "bg-customBlue hover:bg-customPink  relative text-xl  h-16 w-56 p-1 overflow-hidden font-montserrat",
+        "bg-customBlue hover:bg-customPink  relative text-xl  h-16 w-56 p-2 overflow-hidden font-montserrat",
         containerClassName
       )}
       style={{
-        borderRadius: borderRadius
+        borderRadius: "2rem"
       }}
       {...otherProps}
     >

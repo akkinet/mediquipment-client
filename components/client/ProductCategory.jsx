@@ -22,7 +22,7 @@ const ProductCategory = ({ prod }) => {
   return (
     <div>
       <section className="text-black body-font md:flex md:justify-center">
-        <div className="container px-5 lg:py-12 sm: py-4  lg:mx-auto md:mx-0 flex flex-col items-center justify-center">
+        <div className="container px-5 lg:py-12 lg:pb-0 sm: py-4  lg:mx-auto md:mx-0 flex flex-col items-center justify-center">
           <div className="lg:w-3/4 sm:w-full product-title flex flex-col justify-center items-center mb-5">
             <h1 className="text-center lg:text-5xl sm: text-3xl font-bold mb-3 font-montserrat tracking-tighter">
               Product Category
