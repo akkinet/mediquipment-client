@@ -137,9 +137,9 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
       metadata.prescription_required = true;
       const uploadedAll = prescriptionItems.every((p) => p.file);
       metadata.prescription_status = sameFile
-        ? "Recieved"
+        ? "Received"
         : uploadedAll
-        ? "Recieved"
+        ? "Received"
         : "Pending";
       metadata.prescription_items = {};
     } else {
