@@ -99,8 +99,22 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
     clearList();
   };
 
-  const handleInsuranceUpload = (event) => {
-    setInsuranceFile(event.target.files[0]);
+  const handleInsuranceUpload = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+
+      reader.onloadend = () => {
+        setInsuranceFile({
+          fileName: file.name,
+          fileSize: file.size,
+          fileType: file.type,
+          filePreview: reader.result,
+        });
+      };
+
+      reader.readAsDataURL(file);
+    }
   };
 
   const closeModal = () => {
@@ -113,6 +127,12 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
       metadata = {};
     let file = "";
     const metaProd = {};
+
+    if(insuranceOption == "upload" && (!insuranceFile || selectedInsurance == "")){
+        alert("missing fields!");
+        return;
+    }
+
     if (prescriptionItems.length > 0) {
       metadata.prescription_required = true;
       const uploadedAll = prescriptionItems.every((p) => p.file);
@@ -157,7 +177,6 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
       }
 
       lineItems.push({
-        // price: item.price_id,
         price_data: {
           currency: "usd",
           product_data: {
@@ -182,6 +201,17 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
       metadata,
     };
     if (email) checkoutObj.email = email;
+
+    if(insuranceOption == "upload"){
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: JSON.stringify(insuranceFile),
+      });
+      const { fileURL } = await res.json();
+      const inc = fileURL;
+      metadata.insurance_file = inc;
+      metadata.insurance_company = selectedInsurance;
+    }
 
     const checkoutResponse = await fetch("/api/stripe/checkout", {
       method: "POST",

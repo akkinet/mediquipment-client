@@ -71,8 +71,8 @@ export const POST = async (req) => {
         checkout_session.total_details.amount_shipping / 100
       ).toFixed(2),
       tax_amount: (checkout_session.total_details.amount_tax / 100).toFixed(2),
-      insurance_pdf: "",
-      insurance_company: "",
+      insurance_pdf: checkout_session.metadata.insurance_file ?? "",
+      insurance_company: checkout_session.metadata.insurance_company ?? "",
       prescription_required: JSON.parse(
         checkout_session.metadata.prescription_required
       ),
