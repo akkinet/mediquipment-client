@@ -38,8 +38,8 @@ function Cart ({ isCartOpen, authSession }) {
     <>
       {isCartOpen && (
         <div
-          className={`absolute lg:right-28 lg:top-20 sm: top-14 sm:!ml-0 sm: right-6 w-96 bg-white border-2 border-gray-200
-                rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out
+          className={`absolute lg:right-0 lg:top-16 sm: top-14 sm:!ml-0 sm: right-6 w-96 bg-white border-2 border-gray-200
+                rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out text-black
               ${
                 isCartOpen
                   ? 'translate-y-0 opacity-100'
@@ -47,7 +47,7 @@ function Cart ({ isCartOpen, authSession }) {
               }`}
         >
           <div className='p-4 max-h-72 overflow-auto'>
-            <h3 className='text-lg font-semibold'>Cart</h3>
+            <h3 className='text-lg font-semibold '>Cart</h3>
             {cart.length === 0 ? (
               <p className='text-sm text-gray-600'>Your cart is empty.</p>
             ) : (

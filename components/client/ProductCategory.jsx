@@ -19,13 +19,21 @@ const ProductCategory = ({ prod }) => {
     }
   };
 
+  const brands = [
+    { name: "ReactHealth", logo: "https://www.reacthealth.com/images/logo.jpg" },
+    { name: "ResMed", logo: "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4d/ResMed_logo.svg/800px-ResMed_logo.svg.png" },
+    { name: "Rhythm Healthcare", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT07F7mfZp98yQZi4NpX7TJemK2oHVos7wPxg&s" },
+    { name: "Fisher & Paykel Healthcare", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRRm7A27QJxK1JAXhvJq7e_0Q_-vIjOvk6dxg&s" },
+    { name: "Sentec", logo: "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcT5kRz6HKcS3W6GHg0_9h2FpUVtGNNPJjZOTw&s" },
+  ];
+
   return (
-    <div>
-      <section className="text-black body-font md:flex md:justify-center">
+    <div className="">
+      <section className="text-black body-font md:flex md:justify-center font-montserrat">
         <div className="container px-5 lg:py-12 lg:pb-0 sm: py-4  lg:mx-auto md:mx-0 flex flex-col items-center justify-center">
           <div className="lg:w-3/4 sm:w-full product-title flex flex-col justify-center items-center mb-5">
             <h1 className="text-center lg:text-5xl sm: text-3xl font-bold mb-3 font-montserrat tracking-tighter">
-              Product Category
+              Shop By Category
             </h1>
             <p className="text-center lg:text-xl sm: text-md my-2 font-montserrat">
               Explore our advanced medical equipment collection, designed for
@@ -39,7 +47,7 @@ const ProductCategory = ({ prod }) => {
               <div key={d.name} className="button">
                 <Button
                   borderRadius="1rem"
-                  className="text-white  bg-black-800/30  font-semibold text-lg"
+                  className="text-white  bg-black-800/30  font-montserrat text-lg"
                   onClick={() => handleCategoryChange(d.name)}
                 >
                   {d.name}
@@ -58,20 +66,20 @@ const ProductCategory = ({ prod }) => {
                       className="p-4 lg:w-1/3 sm:w-1/2 transition-transform duration-200 transform hover:scale-105 "
                       key={prod.prod_id}
                     >
-                      <div className="h-full border shadow-xl hover:shadow-customPink/20 border-customPink rounded-lg overflow-hidden">
+                      <div className="bg-white h-full border shadow-xl hover:shadow-customPink/20 hover:border-customPink rounded-lg overflow-hidden">
                         <img
-                          className="lg:h-48 md:h-36 lg:w-full  object-contain object-center p-4"
+                          className="lg:h-56 md:h-36 lg:w-full  object-contain object-center p-4 border-b border-black"
                           src={prod.prod_images[0]}
                           alt={prod.prod_name}
                         />
                         <div className="p-6">
-                          <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
+                          {/* <h2 className="tracking-widest text-xs title-font font-medium text-gray-400 mb-1">
                             CATEGORY
-                          </h2>
-                          <h1 className="title-font text-lg font-medium text-gray-900 mb-3">
+                          </h2> */}
+                          <h1 className="title-font text-lg font-medium text-gray-900 mb-3 line-clamp-1">
                             {prod.prod_name}
                           </h1>
-                          <p className="leading-relaxed mb-3 line-clamp-3">{prod.prod_desc}</p>
+                          {/* <p className="leading-relaxed mb-3 line-clamp-3">{prod.prod_desc}</p> */}
                           <div className="flex items-center flex-wrap">
                             <div
                               className="text-customBlue inline-flex items-center md:mb-2 lg:mb-0"
@@ -122,10 +130,44 @@ const ProductCategory = ({ prod }) => {
                 borderRadius="1rem"
                 className="text-white bg-black-800/30  font-semibold text-lg"
               >
-                Load More
+                Shop All
               </Button>
             </Link>
           </div>
+
+          {/* shop by brand section  */}
+          <section>
+            <div className="bg-white py-8 px-4 rounded-full my-12 ">
+              {/* Title */}
+              <h2 className="text-center text-xl md:text-2xl font-bold text-black mb-6">
+                SHOP BY BRAND
+              </h2>
+
+              {/* Brand Logos */}
+              <div className="flex flex-wrap justify-center gap-8 items-center">
+                {brands.map((brand, index) => (
+                  <div key={index} className="flex flex-col items-center">
+                    <img
+                      src={brand.logo}
+                      alt={brand.name}
+                      className="h-12 md:h-16 object-contain"
+                    />
+                    <p className="text-sm text-gray-700 mt-2">{brand.name}</p>
+                  </div>
+                ))}
+              </div>
+
+              {/* View All */}
+              <div className="mt-6 text-center">
+                <a
+                  href="#"
+                  className="text-blue-600 hover:underline font-medium lg:text-2xl"
+                >
+                  View All
+                </a>
+              </div>
+            </div>
+          </section>
         </div>
       </section>
     </div>

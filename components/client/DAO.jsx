@@ -37,9 +37,9 @@ function DAO({ product1, product2 }) {
   };
 
   return (
-    <section className="text-black body-font md:flex md:justify-center">
+    <section className="text-black body-font md:flex md:justify-center font-montserrat ">
       <div className="container px-5 lg:mx-auto md:mx-0 flex flex-col items-center justify-center max-w-lg: py-0">
-        <section className="text-gray-800 body-font flex flex-col lg:px-16 lg:py-10 sm: py-2 max-w-sm: px-0">
+        <section className="text-gray-800 body-font flex flex-col lg:px-20 lg:py-10 sm: py-2 max-w-sm: px-0">
           {product1?.product && (
             <div className="upper-container lg:flex">
               <div className="container rounded-2xl lg:mx-auto lg:my-0 max-w-sm: my-10 flex px-5 py-5 md:flex-row flex-col items-center lg:w-[55%] max-w-sm:w-0 border border-customPink hover:shadow-xl hover:shadow-customPink/30 mx-auto md:mx-0">
