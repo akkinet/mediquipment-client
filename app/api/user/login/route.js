@@ -22,7 +22,7 @@ export const POST = async (req) => {
         { status: 400 }
       );
 
-    const chosenField = ["firstName", "lastName", "username", "email", "image", "createdAt"];
+    const chosenField = ["fullName", "username", "email", "image", "createdAt"];
 
     user = Object.fromEntries(
       Object.entries(user)
@@ -30,8 +30,8 @@ export const POST = async (req) => {
         .map((f) => [f[0], f[1]])
     );
 
-    if(user?.firstName || user?.lastName)
-      user.name = (user?.firstName + " " + user?.lastName).trim() 
+    // if(user?.firstName || user?.lastName)
+    //   user.name = (user?.firstName + " " + user?.lastName).trim() 
       
     return NextResponse.json(user, { status: 200 });
   } catch (err) {
