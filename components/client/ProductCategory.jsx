@@ -50,7 +50,7 @@ const ProductCategory = ({ prod }) => {
           </div>
 
           {/* Category Buttons */}
-          <div className="flex justify-evenly flex-wrap w-[90%] gap-2 px-4">
+          {/* <div className="flex justify-evenly flex-wrap w-[90%] gap-2 px-4">
             {data?.map((d) => (
               <div key={d.name} className="button">
                 <button
@@ -99,10 +99,46 @@ const ProductCategory = ({ prod }) => {
                 </button>
               </div>
             ))}
-          </div>
+          </div> */}
+
+          {/* <div className="flex justify-around items-center w-[80%] bg-gray-100 p-2 rounded-lg shadow-md">
+  {data?.map((d) => (
+    <div key={d.name} className="button">
+      <button
+        className={`px-6 py-2 text-lg font-semibold rounded-lg transition-all duration-200 
+          ${
+            activeCategory === d.name
+              ? "bg-blue-500 text-white" // Active button style
+              : "bg-white text-black hover:bg-gray-200" // Default button style
+          }`}
+        onClick={() => handleCategoryChange(d.name)}
+      >
+        {d.name}
+      </button>
+    </div>
+  ))}
+</div> */}
+
 
           {/* Products Section */}
           <section className="text-gray-600 body-font lg:w-[90%]">
+            <div className="flex flex-wrap lg:justify-around md: justify-center items-center w-full bg-gray-100 p-2 rounded-lg shadow-md">
+              {data?.map((d) => (
+                <div key={d.name} className="m-1"> {/* Small margin for reduced spacing */}
+                  <button
+                    className={`px-4 py-2 text-base md:text-lg font-medium rounded-lg transition-all duration-200 
+          ${activeCategory === d.name
+                        ? "bg-blue-500 text-white"
+                        : "bg-white text-black hover:bg-gray-200"
+                      }`}
+                    onClick={() => handleCategoryChange(d.name)}
+                  >
+                    {d.name}
+                  </button>
+                </div>
+              ))}
+            </div>
+
             <div className="container px-5 py-12 mx-auto">
               <div className="flex flex-wrap -m-4">
                 {products?.map((prod) => (
