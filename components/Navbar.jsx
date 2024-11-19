@@ -24,6 +24,8 @@ const Navbar = () => {
   const { data: session } = useSession();
   const data = useContext(DataContext);
   const [cartItems, setCartItems] = useContext(CartContext);
+  const [lastScrollY, setLastScrollY] = useState(0);
+
 
   const menuRef = useRef();
   const searchRef = useRef();
@@ -33,6 +35,31 @@ const Navbar = () => {
   const toggleSecondaryNav = () => {
     setIsSecondaryNavVisible((prev) => !prev);
   };
+  const handleScroll = () => {
+    const currentScrollY = window.scrollY;
+    if (currentScrollY > lastScrollY) {
+      // Scrolling down
+      setIsSecondaryNavVisible(false);
+    } else {
+      // Scrolling up
+      setIsSecondaryNavVisible(true);
+    }
+    setLastScrollY(currentScrollY);
+  };
+  
+  useEffect(() => {
+    window.addEventListener("scroll", handleScroll);
+    return () => {
+      window.removeEventListener("scroll", handleScroll);
+    };
+  }, [lastScrollY]);
+
+  const navbarStyles = {
+    transform: isSecondaryNavVisible ? "translateY(0)" : "translateY(-100%)",
+    transition: "transform 0.3s ease-in-out",
+  };
+  
+  
 
   const searchHandler = async (e) => {
     try {
@@ -93,19 +120,19 @@ const Navbar = () => {
             alt="Logo"
             className="h-10"
           />
-          <button
+          {/* <button
             ref={menuRef}
             onClick={toggleSecondaryNav}
             className="lg:block md: hidden relative px-6 py-3 text-white font-semibold bg-gradient-to-r from-blue-500 to-purple-600 rounded-lg shadow-lg hover:from-purple-600 hover:to-blue-500 focus:outline-none focus:ring-2 focus:ring-purple-600 focus:ring-opacity-50 transition-all duration-300 transform hover:scale-105 active:scale-95"
           >
             <span className="absolute inset-0 bg-gradient-to-r from-blue-600 to-purple-700 blur-md rounded-lg opacity-70 animate-pulse"></span>
             <span className="relative z-10">Menu</span>
-          </button>
+          </button> */}
         </div>
 
         {/* Center Section */}
         <div className="hidden lg:flex justify-center items-center ">
-          <span className="text-gray-700 text-lg lg:text-md  font-semibold">
+          <span className="text-black text-lg lg:text-md  font-semibold">
             Questions? Call Us Toll-free{" "}
             <span className="text-blue-500 font-bold">1-800-567-000</span>
           </span>
@@ -367,7 +394,7 @@ const Navbar = () => {
       )}
 
       {/* Secondary Navbar */}
-      <div className="lg:block md: hidden">
+      <div style={navbarStyles} className="lg:block md: hidden">
         {isSecondaryNavVisible && (
           <div className="py-4 " ref={cartRef}>
             <div className="flex items-center max-w-[86rem]  mx-auto px-4">

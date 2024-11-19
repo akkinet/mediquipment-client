@@ -67,7 +67,7 @@ function page() {
           <div className="w-16 h-16 bg-customPink rounded-full flex items-center justify-center mb-4 animate-pulse">
             <CiCircleCheck className="w-10 h-10 text-white" />
           </div>
-          <h2 className="text-2xl font-bold mb-2 font-montserrat">
+          <h2 className="text-2xl font-light mb-2 font-montserrat">
             Payment Successful
           </h2>
           <p className="text-center mb-6 font-montserrat">

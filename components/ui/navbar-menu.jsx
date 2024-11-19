@@ -19,7 +19,7 @@ export const MenuItem = ({ setActive, active, item, children }) => {
       <motion.p
         transition={{ duration: 0.3 }}
         // Navbar styling Properties
-        className='cursor-pointer text-white hover:text-customPink lg:text-xl lg:font-normal md:font-light'
+        className='cursor-pointer text-white hover:text-customPink lg:text-lg lg:font-normal md:font-light'
       >
         {item}
       </motion.p>

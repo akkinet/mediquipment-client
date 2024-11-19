@@ -7,17 +7,27 @@ function HeroSection() {
   return (
     <div
       className="relative w-full h-screen flex items-center justify-center sm:justify-start bg-cover bg-center bg-no-repeat"
-      style={{
-        backgroundImage:
-          "url('https://s3.ap-south-1.amazonaws.com/medicom.hexerve/hero+section+background.jpg')",
-      }}
+      // style={{
+      //   backgroundImage:
+      //     "url('https://s3.ap-south-1.amazonaws.com/medicom.hexerve/hero+section+background.jpg')",
+      // }}
     >
+         <div className="absolute inset-0 w-full h-full">
+        <video
+          className="w-full h-full object-cover"
+          controls={false}
+          autoPlay
+          loop
+          muted
+          src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/Gen-3+Alpha+Turbo+2881096457%2C+Cropped+-+AdobeStock%2C+M+5.mp4"
+        ></video>
+      </div>
       {/* Content */}
       <div className="relative z-20 text-center sm:text-left px-6 sm:px-10 lg:px-20 font-montserrat max-w-3xl mt-12">
-        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-blue-800 font-semibold">
+        <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-customPink font-semibold">
           Welcome to JKARE!
         </h1>
-        <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-black mt-4 leading-snug relative">
+        <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray mt-4 leading-snug relative">
           IN-HOME CARE <br /> FOR EVERY{" "}
           <span className="inline-block relative">
             BREATH
