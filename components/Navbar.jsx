@@ -76,6 +76,10 @@ const Navbar = () => {
   };
 
   useEffect(() => {
+    const localCart =
+      typeof window !== "undefined" && window.localStorage.getItem("medCart");
+    if (localCart) setCartItems(JSON.parse(localCart).length);
+
     document.addEventListener("click", handleClickOutside);
     return () => {
       document.removeEventListener("click", handleClickOutside);
@@ -88,11 +92,13 @@ const Navbar = () => {
       <div className="flex items-center justify-between backdrop-blur-lg bg-white/30 border border-white/20 shadow-lg py-2 px-4 lg:px-8">
         {/* Logo Section */}
         <div className="flex-1 flex items-center space-x-4 lg:space-x-24">
+          <Link href="/">
           <img
             src="https://images.squarespace-cdn.com/content/v1/60aefe75c1a8f258e529fbac/1622081456984-G5MG4OZZJFVIM3R01YN7/jkare-2.png?format=1500w"
             alt="Logo"
             className="h-10"
-          />
+            />
+          </Link>
           <button
             ref={menuRef}
             onClick={toggleSecondaryNav}
@@ -109,7 +115,6 @@ const Navbar = () => {
             Questions? Call Us Toll-free{" "}
             <span className="text-blue-500 font-bold">1-800-567-000</span>
           </span>
-
         </div>
 
         {/* Right Section */}
@@ -144,12 +149,16 @@ const Navbar = () => {
                             alt={item.prod_name}
                             className="w-10 h-10 rounded-md object-cover mr-3"
                           />
-                          <span className="text-gray-800">{item.prod_name}</span>
+                          <span className="text-gray-800">
+                            {item.prod_name}
+                          </span>
                         </Link>
                       ))}
                     </ul>
                   ) : (
-                    <div className="p-4 text-gray-500 text-center">No items found</div>
+                    <div className="p-4 text-gray-500 text-center">
+                      No items found
+                    </div>
                   )}
                 </div>
               </div>
@@ -165,12 +174,16 @@ const Navbar = () => {
               }}
             />
             {cartItems > 0 && (
-              <span className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white
-               bg-red-500 rounded-full">
+              <span
+                className="absolute -top-2 -right-2 inline-flex items-center justify-center px-2 py-1 text-xs font-bold leading-none text-white
+               bg-red-500 rounded-full"
+              >
                 {cartItems}
               </span>
             )}
-            {isCartOpen && <Cart isCartOpen={isCartOpen} authSession={session} />}
+            {isCartOpen && (
+              <Cart isCartOpen={isCartOpen} authSession={session} />
+            )}
           </div>
 
           {/* User */}
@@ -194,7 +207,9 @@ const Navbar = () => {
                 {isUserCardOpen && (
                   <div className="absolute top-14 right-2 w-50 bg-white shadow-lg rounded-lg p-4 z-50 border-2 border-gray-200">
                     <p className="font-semibold">{session.user.name}</p>
-                    <p className="text-sm text-gray-600">{session.user.email}</p>
+                    <p className="text-sm text-gray-600">
+                      {session.user.email}
+                    </p>
                     {session.provider === "credentials" && (
                       <p className="text-md text-gray-600">
                         <Link href="/profile-detail">
@@ -277,9 +292,7 @@ const Navbar = () => {
                     strokeLinejoin="round"
                     strokeWidth="2"
                     d={
-                      isProductsDropdownOpen
-                        ? "M19 9l-7 7-7-7"
-                        : "M9 5l7 7-7 7"
+                      isProductsDropdownOpen ? "M19 9l-7 7-7-7" : "M9 5l7 7-7 7"
                     }
                   />
                 </svg>
@@ -352,7 +365,6 @@ const Navbar = () => {
                       </button>
                     </div>
                   </div>
-
                 </div>
               ) : (
                 <Link href="/login">
@@ -374,13 +386,24 @@ const Navbar = () => {
               <div className="flex items-center space-x-6 text-white font-semibold text-sm bg-customBlue px-4 rounded-3xl">
                 <Menu setActive={setActive}>
                   <Link href="/">
-                    <MenuItem setActive={setActive} active={active} item="Home" />
+                    <MenuItem
+                      setActive={setActive}
+                      active={active}
+                      item="Home"
+                    />
                   </Link>
-                  <MenuItem setActive={setActive} active={active} item="Products">
+                  <MenuItem
+                    setActive={setActive}
+                    active={active}
+                    item="Products"
+                  >
                     <div className="flex flex-col space-y-3 text-md">
                       <>
                         {data.map((d) => (
-                          <HoveredLink key={d.name} href={`/category/${d.name}`}>
+                          <HoveredLink
+                            key={d.name}
+                            href={`/category/${d.name}`}
+                          >
                             {d.name}
                           </HoveredLink>
                         ))}
@@ -401,22 +424,46 @@ const Navbar = () => {
                     </div>
                   </MenuItem>
                   <Link href="/about-us">
-                    <MenuItem setActive={setActive} active={active} item="About Us" />
+                    <MenuItem
+                      setActive={setActive}
+                      active={active}
+                      item="About Us"
+                    />
                   </Link>
                   <Link href="/">
-                    <MenuItem setActive={setActive} active={active} item="Services" />
+                    <MenuItem
+                      setActive={setActive}
+                      active={active}
+                      item="Services"
+                    />
                   </Link>
                   <Link href="/">
-                    <MenuItem setActive={setActive} active={active} item="Patient Resources" />
+                    <MenuItem
+                      setActive={setActive}
+                      active={active}
+                      item="Patient Resources"
+                    />
                   </Link>
                   <Link href="/">
-                    <MenuItem setActive={setActive} active={active} item="Why JKare" />
+                    <MenuItem
+                      setActive={setActive}
+                      active={active}
+                      item="Why JKare"
+                    />
                   </Link>
                   <Link href="/blog">
-                    <MenuItem setActive={setActive} active={active} item="Blog" />
+                    <MenuItem
+                      setActive={setActive}
+                      active={active}
+                      item="Blog"
+                    />
                   </Link>
                   <Link href="/contact-us">
-                    <MenuItem setActive={setActive} active={active} item="Contact Us" />
+                    <MenuItem
+                      setActive={setActive}
+                      active={active}
+                      item="Contact Us"
+                    />
                   </Link>
                 </Menu>
               </div>
