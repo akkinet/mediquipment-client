@@ -19,7 +19,7 @@ function HeroSection() {
           autoPlay
           loop
           muted
-          src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/Gen-3+Alpha+Turbo+2881096457%2C+Cropped+-+AdobeStock%2C+M+5.mp4"
+          src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/hero+section+video.mp4"
         ></video>
       </div>
       {/* Content */}
