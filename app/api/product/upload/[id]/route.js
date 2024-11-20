@@ -56,7 +56,9 @@ export const GET = async (req, ctx) => {
             Body: imageData,
           })
         );
-        const imageUrl = `https://${Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${Key}`;
+        // const imageUrl = `https://${Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${Key}`;
+        const imageUrl = `https://s3.${process.env.AWS_REGION}.amazonaws.com/${Bucket}/${Key}`;
+
         images.push(imageUrl);
       } catch (error) {
         console.error(`Error processing image ${image}:`, error);
