@@ -107,7 +107,8 @@ const EditProfile = () => {
 
       const res = await fetch(`/api/user/update/${localUser.username}`, {
         method: "PUT",
-        body: JSON.stringify({ ...userData, createdAt: localUser.createdAt }),
+        body: JSON.stringify({ ...userData, createdAt: localUser.createdAt }), 
+        
       });
 
       await res.json();
