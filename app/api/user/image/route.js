@@ -15,7 +15,8 @@ export const POST = async (req) => {
     const Key = `${file_name}_${new Date().getTime()}.${extension}`;
     const s3 = new S3Client();
     await s3.send(new PutObjectCommand({ Bucket, Key, Body }));
-    const imageUrl = `https://${Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${Key}`;
+    // const imageUrl = `https://${Bucket}.s3.${process.env.AWS_REGION}.amazonaws.com/${Key}`;
+    const imageUrl = `https://s3.${process.env.AWS_REGION}.amazonaws.com/${Bucket}/${Key}`;
     return NextResponse.json({
       success: true,
       secureUrl: imageUrl,
