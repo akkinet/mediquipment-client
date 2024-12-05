@@ -118,7 +118,7 @@ const Navbar = () => {
       {/* Primary Navbar */}
       <div className="flex items-center justify-between backdrop-blur-lg bg-white/30 border border-white/20 shadow-lg py-2 px-4 lg:px-8">
         {/* Logo Section */}
-        <div className="flex-1 flex items-center space-x-4 lg:space-x-24">
+        <div className="flex-1 flex items-center space-x-4 lg:space-x-24 ml-[4rem]">
           <Link href="/">
           <img
             src="https://images.squarespace-cdn.com/content/v1/60aefe75c1a8f258e529fbac/1622081456984-G5MG4OZZJFVIM3R01YN7/jkare-2.png?format=1500w"
@@ -241,22 +241,23 @@ const Navbar = () => {
                       <p className="text-md text-gray-600">
                         <Link href="/profile-detail">
                           <button className="mt-2 w-full bg-customBlue focus-visible:bg-customBaseBlue text-white py-1 px-2 rounded">
-                            Edit Profile
+                            Account Setting
                           </button>
                         </Link>
                       </p>
                     )}
+                   
+                    <Link href="/order-history">
+                      <button className="mt-2 w-full bg-customBlue focus-visible:bg-customBaseBlue text-white py-1 px-2 rounded">
+                        My Orders
+                      </button>
+                    </Link>
                     <button
                       onClick={signMeOut}
                       className="mt-2 w-full bg-customBlue focus-visible:bg-customBaseBlue text-white py-1 px-2 rounded"
                     >
                       Sign Out
                     </button>
-                    <Link href="/order-history">
-                      <button className="mt-2 w-full bg-customBlue focus-visible:bg-customBaseBlue text-white py-1 px-2 rounded">
-                        Order History
-                      </button>
-                    </Link>
                   </div>
                 )}
               </div>

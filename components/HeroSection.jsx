@@ -27,7 +27,7 @@ function HeroSection() {
         <h1 className="text-lg sm:text-xl md:text-2xl lg:text-3xl text-customPink font-semibold">
           Welcome to JKARE!
         </h1>
-        <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray mt-4 leading-snug relative">
+        <h2 className="text-4xl text-gray-900 sm:text-5xl md:text-6xl lg:text-7xl font-bold text-gray mt-4 leading-snug relative">
           IN-HOME CARE <br /> FOR EVERY{" "}
           <span className="inline-block relative">
             BREATH
