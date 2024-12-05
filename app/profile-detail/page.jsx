@@ -104,7 +104,6 @@ const EditProfile = () => {
       });
 
       const updatedUser = await res.json();
-      delete formData.delete("profile");
       const updatedSession = {
         ...session,
         user: {

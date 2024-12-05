@@ -1,44 +1,25 @@
-import { QueryCommand } from "@aws-sdk/lib-dynamodb";
-import { ddbDocClient } from "../../../../../config/ddbDocClient";
 import { NextResponse } from "next/server";
+import { getUser } from "../../../../../lib/db-utils";
 
-export const GET = async (req, { params }) => {
-  const data = params.id;
-
+export const GET = async (req, ctx) => {
   try {
-    const params = {
-      TableName: "Users",
-      KeyConditionExpression: "username = :username",
-      ExpressionAttributeValues: {
-        ":username": data,
-      },
-    };
+    const info = ctx.params.id;
 
-    const command = new QueryCommand(params);
-    let result = await ddbDocClient.send(command);
+    const user = await getUser(info);
 
-    if (!result.Items || result.Items.length === 0) {
-      const params = {
-        TableName: "Users",
-        IndexName: "email-index",
-        KeyConditionExpression: "email = :email",
-        ExpressionAttributeValues: {
-          ":email": data,
-        },
-      };
-
-      const command = new QueryCommand(params);
-      result = await ddbDocClient.send(command);
-    }
-
-    if (result.Items && result.Items.length > 0) {
-      const user = result.Items[0];
+    if (user) {
       return NextResponse.json(user, { status: 200 });
+    } else {
+      return NextResponse.json(
+        { message: "No user found with the given criteria" },
+        { status: 404 }
+      );
     }
-
-    return NextResponse.json({ message: "Not Found" }, { status: 404 });
-  } catch (error) {
-    console.error(error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+  } catch (err) {
+    console.error("Error fetching user:", err);
+    return NextResponse.json(
+      { message: "Internal server error", error: err.message },
+      { status: 500 }
+    );
   }
 };
