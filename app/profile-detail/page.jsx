@@ -17,7 +17,7 @@ const EditProfile = () => {
   const [address, setAddress] = useState(localUser ? localUser.address : {});
   const [profilePhoto, setProfilePhoto] = useState(
     localUser?.image ??
-    "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/profilelogo.png"
+      "https://s3.ap-south-1.amazonaws.com/medicom.hexerve/profilelogo.png"
   ); // Default profile photo
   const [file, setFile] = useState(null);
 
@@ -38,8 +38,6 @@ const EditProfile = () => {
     router.push(path);
   };
 
-
-
   const handleNameChange = (e) => {
     setName(e.target.value);
   };
@@ -54,7 +52,11 @@ const EditProfile = () => {
     setAddress({
       ...address,
       [name]:
-        name === "postal_code" ? (!isNaN(value.trim()) ? value.trim() : "") : value,
+        name === "postal_code"
+          ? !isNaN(value.trim())
+            ? value.trim()
+            : ""
+          : value,
     });
   };
 
@@ -71,17 +73,6 @@ const EditProfile = () => {
   const handleSubmit = async (e) => {
     try {
       e.preventDefault();
-      let imgData = null;
-      if (file) {
-        const formData = new FormData();
-        formData.set("profile", file);
-
-        const imgRes = await fetch("/api/user/image", {
-          method: "POST",
-          body: formData,
-        });
-        imgData = await imgRes.json();
-      }
 
       if (
         name === "" ||
@@ -97,38 +88,39 @@ const EditProfile = () => {
         return;
       }
 
-      const userData = {
-        fullName: name,
-        phone,
-        address,
-      };
+      const formData = new FormData();
+      if(file)
+        formData.append("profile", file);
 
-      if (imgData?.success) userData.image = imgData.secureUrl;
+      formData.append("fullName", name);
+      formData.append("address", JSON.stringify(address));
+      formData.append("phone", phone);
+      formData.append("updatedAt", new Date().toLocaleString());
+      formData.append("createdAt", localUser.createdAt);
 
       const res = await fetch(`/api/user/update/${localUser.username}`, {
         method: "PUT",
-        body: JSON.stringify({ ...userData, createdAt: localUser.createdAt }),
-
+        body: formData,
       });
 
-      await res.json();
+      const updatedUser = await res.json();
       const updatedSession = {
         ...session,
         user: {
           ...session.user,
-          ...userData,
           name,
+          ...updatedUser.user
         },
       };
+      await update(updatedSession);
       window.localStorage.setItem(
         "nextUser",
         JSON.stringify({
           ...session.user,
-          ...userData,
-          fullName: name,
+          ...updatedUser.user
+
         })
       );
-      await update(updatedSession);
 
       toast.success("Data updated successfully!");
     } catch (err) {
@@ -257,7 +249,19 @@ const EditProfile = () => {
                   </div>
                   {/* Address Section */}
                   <div>
-                    <label className="block text-gray-600 mb-2 font-medium">Address Line 1</label>
+                    <label className="block text-gray-600 mb-1">Phone</label>
+                    <input
+                      type="text"
+                      value={phone}
+                      onChange={handlePhoneChange}
+                      className="block w-full border rounded-md px-4 py-2 shadow-sm"
+                      placeholder="Enter your phone number"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-gray-600 mb-1">
+                      Address Line 1
+                    </label>
                     <input
                       type="text"
                       value={address?.line1}
@@ -268,7 +272,10 @@ const EditProfile = () => {
                     />
                   </div>
                   <div>
-                    <label className="block text-gray-600 mb-2 font-medium">Address Line 2</label>
+                    <label className="block text-gray-600 mb-1">
+                      {" "}
+                      Address Line 2
+                    </label>
                     <input
                       type="text"
                       value={address?.line2}
