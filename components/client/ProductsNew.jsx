@@ -87,7 +87,7 @@ const Products = ({ productList, brands }) => {
   };
 
   return (
-    <div className='text-black mt-24 lg:flex lg:mx-20 font-montserrat'>
+    <div className='text-black mt-32 lg:flex lg:mx-20 font-montserrat'>
       <div className="leftcontainer lg:h-auto lg:w-1/4 p-4 mt-2 bg-gray-100 rounded-xl shadow-md ">
         <h1 className='text-4xl font-semibold mb-4 capitalize'></h1>
         <hr className='border-2 border-customBlue mb-2' />

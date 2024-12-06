@@ -133,7 +133,7 @@ const ProductByCategoryPage = ({ productList, category, brandList }) => {
   );
 
   return (
-    <div className="text-black mt-24 lg:flex lg:mx-20 font-montserrat">
+    <div className="text-black mt-32 lg:flex lg:mx-20 font-montserrat">
       {productList.length == 0 ? (
         renderSkeletonFilters()
       ) : (

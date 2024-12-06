@@ -12,12 +12,12 @@ const Category = ({ category }) => {
                             <div className='h-6 bg-gray-300 w-3/4 mb-2 rounded'></div>
                         </div>
                     </div>
-                </div>   
+                </div>
             ))}
-        </div> 
+        </div>
     )
     return (
-        <div className='text-black mt-24 lg:flex lg:justify-center lg:mx-20 font-montserrat'>
+        <div className='text-black mt-32 lg:flex lg:justify-center lg:mx-20 font-montserrat'>
             {category.length == 0 ? (
                 renderSkeletonProducts()
             ) : (

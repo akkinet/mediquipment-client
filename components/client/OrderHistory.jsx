@@ -2,7 +2,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import Alert from "../../components/ui/Alert";
- 
+
 function OrderHistory({ orders, email }) {
   const [searchTerm, setSearchTerm] = useState("");
   const [fromDate, setFromDate] = useState("");
@@ -11,17 +11,17 @@ function OrderHistory({ orders, email }) {
   const [currentOrders, setCurrentOrders] = useState(orders);
   const [errMsg, setErrMsg] = useState(null);
   const ordersPerPage = 4;
- 
+
   //   // Handle pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const orderList = currentOrders.slice(indexOfFirstOrder, indexOfLastOrder);
   const totalPages = Math.ceil(currentOrders.length / ordersPerPage);
- 
+
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
   };
- 
+
   function formatDate(date) {
     const options = {
       year: "numeric",
@@ -32,10 +32,10 @@ function OrderHistory({ orders, email }) {
       second: "2-digit",
       hour12: true,
     };
- 
+
     return new Intl.DateTimeFormat("en-US", options).format(date);
   }
- 
+
   const handleResetDate = async () => {
     setFromDate("");
     setToDate("");
@@ -45,7 +45,7 @@ function OrderHistory({ orders, email }) {
     setSearchTerm("");
     setCurrentPage(1);
   };
- 
+
   const searchByID = async (value) => {
     try {
       let myOrders;
@@ -63,7 +63,7 @@ function OrderHistory({ orders, email }) {
       setTimeout(() => setErrMsg(null), [3000]);
     }
   };
- 
+
   const searchByDate = async () => {
     try {
       if (fromDate == "" || toDate == "") {
@@ -71,13 +71,13 @@ function OrderHistory({ orders, email }) {
         setTimeout(() => setErrMsg(null), [3000]);
         return;
       }
- 
+
       if (new Date(fromDate) > new Date(toDate)) {
         setErrMsg("date must follow the order!");
         setTimeout(() => setErrMsg(null), [3000]);
         return;
       }
- 
+
       const from = formatDate(new Date(fromDate));
       const to = formatDate(new Date(toDate));
       const res = await fetch(`/api/order/${email}?from=${from}&to=${to}`);
@@ -88,15 +88,18 @@ function OrderHistory({ orders, email }) {
       setTimeout(() => setErrMsg(null), [3000]);
     }
   };
- 
+
   return (
-    <div className="container mx-auto p-6 border-2 border-gray-200/80 mt-20 w-[70%] font-montserrat">
+    <div className="container mx-auto p-6 border-2 border-gray-200/80 mt-32 mb-10 w-[70%] font-montserrat">
       {errMsg && (
         <Alert message={errMsg} closeHandler={() => setErrMsg(null)} />
       )}
-      <h1 className="text-3xl font-bold mb-4">Your Orders</h1>
- 
-      <div className="flex justify-between items-center mb-6">
+      <h1 className="text-3xl font-bold mb-4 border-b-2 border-gray-300 pb-2">
+        Your Orders
+      </h1>
+
+
+      <div className="flex justify-between items-center mb-6 ">
         <div className="relative">
           <input
             type="text"
@@ -107,7 +110,7 @@ function OrderHistory({ orders, email }) {
           />
           <span className="absolute right-2 top-3 text-gray-500">🔍</span>
         </div>
- 
+
         <div className="flex items-center space-x-4">
           <div className="flex items-center space-x-4">
             <div>
@@ -145,11 +148,11 @@ function OrderHistory({ orders, email }) {
           </div>
         </div>
       </div>
- 
-      <p className="mb-6 font-semibold">
+
+      <p className="mb-6 font-semibold border-b-2 border-gray-300 pb-2">
         Showing {currentOrders.length} orders
       </p>
- 
+
       {orderList.length > 0 ? (
         orderList.map((order, index) => (
           <div
@@ -160,7 +163,7 @@ function OrderHistory({ orders, email }) {
               <p className="text-sm text-gray-600">
                 <strong>ORDER PLACED</strong> <br /> {order.order_date}
               </p>
- 
+
               <div className="flex items-center space-x-4">
                 <p className="text-sm text-gray-600">
                   <strong>ORDER ID #</strong> <br /> {order.id}
@@ -170,11 +173,10 @@ function OrderHistory({ orders, email }) {
                 </button>
               </div>
             </div>
- 
+
             <div
-              className={`overflow-y-auto ${
-                order.items.length > 1 ? "h-48" : ""
-              } pr-2`}
+              className={`overflow-y-auto ${order.items.length > 1 ? "h-48" : ""
+                } pr-2`}
             >
               <table className="w-full text-left border-collapse">
                 <thead>
@@ -224,7 +226,7 @@ function OrderHistory({ orders, email }) {
                 </tbody>
               </table>
             </div>
- 
+
             <div className="mt-6 bg-gray-100 px-4 py-1 rounded-lg flex justify-between">
               <div className="text-sm">
                 <h3 className="font-bold">Price Breakdown:</h3>
@@ -232,7 +234,7 @@ function OrderHistory({ orders, email }) {
                 <p>Discount: -${order.discount_amount}</p>
                 <p className="font-bold">Total: ${order.total_amount}</p>
               </div>
- 
+
               <div className="text-sm">
                 <h3 className="font-bold">Shipping Address:</h3>
                 <p className="text-gray-700">
@@ -259,18 +261,17 @@ function OrderHistory({ orders, email }) {
           </p>
         </div>
       )}
- 
+
       {/* Pagination */}
       <div className="flex justify-center mt-4">
         {Array.from({ length: totalPages }, (_, i) => i + 1).map(
           (pageNumber) => (
             <button
               key={pageNumber}
-              className={`mx-1 px-4 py-2 rounded-md ${
-                currentPage === pageNumber
+              className={`mx-1 px-4 py-2 rounded-md ${currentPage === pageNumber
                   ? "bg-blue-500 text-white"
                   : "bg-gray-200"
-              }`}
+                }`}
               onClick={() => handlePageChange(pageNumber)}
             >
               {pageNumber}
@@ -281,7 +282,6 @@ function OrderHistory({ orders, email }) {
     </div>
   );
 }
- 
+
 export default OrderHistory;
- 
- 
+
