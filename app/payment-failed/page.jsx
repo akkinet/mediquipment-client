@@ -23,6 +23,7 @@ const PaymentFailedPage = () => {
             </div>
           </Link>
         </div> */}
+        
       </div>
     </div>
   );
