@@ -60,11 +60,11 @@ function page() {
   }
 
   return (
-    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 mt-7 relative font-montserrat">
+    <div className="flex flex-col items-center justify-center min-h-screen bg-gray-100 p-4 mt-11 relative font-montserrat w-full">
       {confettiVisible && (
         <Confetti width={window.innerWidth} height={window.innerHeight} />
       )}
-      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-md z-10">
+      <div className="bg-white p-8 rounded-lg shadow-lg w-full max-w-lg z-10">
         <div className="flex flex-col items-center">
           <div className="w-16 h-16 bg-customPink rounded-full flex items-center justify-center mb-4 animate-pulse">
             <CiCircleCheck className="w-10 h-10 text-white" />
@@ -114,13 +114,19 @@ function page() {
           )
         )}
 
-        <div className="flex justify-center">
+        <div className="flex justify-center space-x-4">
           <Link href={"/product"}>
             <button className="bg-customPink hover:bg-customPink/80 text-white font-bold py-2 px-4 border-b-4 border-customBlue rounded">
               Continue Shopping
             </button>
           </Link>
+          <Link href={"/order-history"}>
+            <button className="bg-customPink hover:bg-customPink/80 text-white font-bold py-2 px-4 border-b-4 border-customBlue rounded">
+              My Orders
+            </button>
+          </Link>
         </div>
+
       </div>
     </div>
   );
