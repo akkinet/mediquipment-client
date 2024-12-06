@@ -38,7 +38,7 @@ function Cart ({ isCartOpen, authSession }) {
     <>
       {isCartOpen && (
         <div
-          className={`absolute lg:-left-60 lg:top-16 sm: top-14 sm:!ml-0 sm: right-6 w-96 bg-white border-2 border-gray-200
+          className={`absolute lg:-left-72 lg:top-16 sm: top-14 sm:!ml-0 sm: right-6 w-96 bg-white border-2 border-gray-200
                 rounded-lg shadow-lg transform transition-transform duration-300 ease-in-out text-black
               ${
                 isCartOpen
