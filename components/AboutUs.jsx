@@ -10,6 +10,7 @@ export default function AboutUs() {
         <div className="relative z-10 p-12 ">
           {/* Decorative Image Behind (Hidden in smaller screens) */}
           <img
+          
             src="https://s3.ap-south-1.amazonaws.com/medicom.hexerve/plus+image.png"
             alt="Decorative background"
             className="absolute bottom-0 left-0 h-[30%] w-auto pointer-events-none z-0 hidden md:block"
