@@ -240,7 +240,7 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
               style={{ maxHeight: "250px" }}
             >
               <table className="w-full border-collapse border border-gray-300">
-                <thead>
+                <thead className="sticky top-0 bg-white">
                   <tr>
                     <th className="border border-gray-300 p-2">S.no</th>
                     <th className="border border-gray-300 p-2">Image</th>
