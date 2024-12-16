@@ -9,7 +9,7 @@ export const POST = async req => {
     const lastDot = fileName.lastIndexOf(".");
     const file_name = fileName.slice(0,lastDot);
     const extension = fileName.slice(lastDot + 1);
-    const newFileName = `${file_name}_${new Date().getTime()}.${extension}`;
+    const newFileName = `px&inc/${file_name}_${new Date().getTime()}.${extension}`;
     const s3 = new S3Client();
     const params = {
       Bucket: "medicom.hexerve", // Replace with your S3 bucket name
