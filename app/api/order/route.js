@@ -115,7 +115,7 @@ export const POST = async (req) => {
         image: product.prod_images[0],
         quantity: item.quantity,
         price: (item.amount_total / 100).toFixed(2),
-        prescription_required: presItems[product.prod_id] ? (presItems[product.prod_id] == "" ? false : true) : false,
+        prescription_required: presItems[product.prod_id] ? presItems[product.prod_id] == "" : false,
         prescription_file: presItems[product.prod_id] ?? "",
       });
     }
