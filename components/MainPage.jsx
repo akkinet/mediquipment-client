@@ -11,7 +11,7 @@ function MainPage() {
   return (
     <>
       <HeroSection />
-      <div className="bg-[radial-gradient(circle_at_50%_50%,_#a6a6a6,_#ffffff)] w-full h-full">
+      <div className="bg-[radial-gradient(circle_at_50%_50%,_#7bcbfb,_#ffffff)] w-full h-full">
       <NewArrivals />
       <HomeProduct />
       </div>

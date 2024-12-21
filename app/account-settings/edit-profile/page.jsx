@@ -129,67 +129,9 @@ const EditProfile = () => {
   };
 
   return (
-    <div className="max-w-7xl mx-auto mt-32 py-10 px-6 sm:px-8 lg:px-10 font-montserrat">
+    <div className="max-w-7xl font-montserrat">
       <ToastContainer />
-      <div className="grid grid-cols-1 lg:grid-cols-4 gap-10">
-        {/* Breadcrumb and Sidebar */}
-        <div className="col-span-1 space-y-6">
-          {/* Back to Home Button */}
-          <div className="flex items-center space-x-3">
-            <button
-              onClick={() => router.push("/")}
-              className="flex items-center gap-2 bg-customPink text-white px-4 py-2 rounded-full shadow-md hover:bg-customBlue hover:shadow-lg transition duration-200"
-            >
-              <FaArrowLeft className="text-lg" />
-              <span className="text-sm font-medium">Back to Home</span>
-            </button>
-          </div>
-          {/* Navigation Section */}
-          <div className="bg-white shadow-lg rounded-lg p-6 border-2">
-            <h3 className="text-xl font-semibold mb-4 border-b-2 border-gray-300 pb-2">Navigation</h3>
-            <ul className="space-y-4">
-              <li
-                onClick={() => handleNavigation("/profile-detail")}
-                className={`cursor-pointer flex items-center gap-3 p-3 rounded-lg transition duration-200 ${activeOption === "/profile-detail"
-                  ? "bg-customPink text-white font-bold"
-                  : "text-customPink hover:bg-gray-100 hover:text-customBlue"
-                  }`}
-              >
-                <span className="text-base">Edit Profile</span>
-              </li>
-              <li
-                onClick={() => handleNavigation("/order-history")}
-                className={`cursor-pointer flex items-center gap-3 p-3 rounded-lg transition duration-200 ${activeOption === "/order-history"
-                  ? "bg-customPink text-white font-bold"
-                  : "text-customPink hover:bg-gray-100 hover:text-customBlue"
-                  }`}
-              >
-                <span className="text-base">My Orders</span>
-              </li>
-              <li
-                onClick={() => handleNavigation("/address-book")}
-                className={`cursor-pointer flex items-center gap-3 p-3 rounded-lg transition duration-200 ${activeOption === "/address-book"
-                  ? "bg-customPink text-white font-bold"
-                  : "text-customPink hover:bg-gray-100 hover:text-customBlue"
-                  }`}
-              >
-                <span className="text-base">Address Book</span>
-              </li>
-              <li
-                onClick={() => handleNavigation("/gift-card")}
-                className={`cursor-pointer flex items-center gap-3 p-3 rounded-lg transition duration-200 ${activeOption === "/gift-card"
-                  ? "bg-customPink text-white font-bold"
-                  : "text-customPink hover:bg-gray-100 hover:text-customBlue"
-                  }`}
-              >
-                <span className="text-base">Gift Card</span>
-              </li>
-            </ul>
-          </div>
-        </div>
-
         {/* Edit Profile Section */}
-        <div className="max-w-4xl mx-auto bg-white shadow-xl rounded-lg overflow-hidden col-span-1 lg:col-span-3 border-2 border-customPink">
           <div className="grid grid-cols-1 lg:grid-cols-3">
             {/* Profile Photo Section */}
             <div className="bg-gradient-to-r from-customPink/80 to-gray-100 p-8 flex flex-col items-center text-white">
@@ -329,11 +271,9 @@ const EditProfile = () => {
               </form>
             </div>
           </div>
-        </div>
-
+        
 
       </div>
-    </div>
   );
 };
 

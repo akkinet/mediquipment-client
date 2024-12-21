@@ -26,7 +26,6 @@ const Navbar = () => {
   const [cartItems, setCartItems] = useContext(CartContext);
   const [lastScrollY, setLastScrollY] = useState(0);
 
-
   const menuRef = useRef();
   const searchRef = useRef();
   const userCardRef = useRef();
@@ -239,7 +238,7 @@ const Navbar = () => {
                     </p>
                     {session.provider === "credentials" && (
                       <p className="text-md text-gray-600">
-                        <Link href="/profile-detail">
+                        <Link href="/account-settings">
                           <button className="mt-2 w-full bg-customBlue focus-visible:bg-customBaseBlue text-white py-1 px-2 rounded">
                             Account Setting
                           </button>

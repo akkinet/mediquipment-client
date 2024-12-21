@@ -128,7 +128,7 @@ const ProductCategory = ({ prod }) => {
                   <button
                     className={`px-4 py-2 text-base md:text-lg font-medium rounded-lg transition-all duration-200 
           ${activeCategory === d.name
-                        ? "bg-blue-500 text-white"
+                        ? "bg-customPink text-white"
                         : "bg-white text-black hover:bg-gray-200"
                       }`}
                     onClick={() => handleCategoryChange(d.name)}
@@ -138,7 +138,6 @@ const ProductCategory = ({ prod }) => {
                 </div>
               ))}
             </div>
-
             <div className="container px-5 py-12 mx-auto">
               <div className="flex flex-wrap -m-4">
                 {products?.map((prod) => (

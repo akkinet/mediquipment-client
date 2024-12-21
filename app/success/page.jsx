@@ -28,8 +28,7 @@ function page() {
     const fetchPaymentDetails = async () => {
       if (session_id) {
         const response = await fetch(
-          `http://localhost:3000/api/stripe/checkout/${session_id}`
-        );
+          `http://localhost:3000/api/stripe/checkout/${session_id}`,{mode:'cors'});
         const data = await response.json();
         setPaymentDetails(data);
         setLoading(false); // Stop loading when data is fetched
