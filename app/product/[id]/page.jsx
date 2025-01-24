@@ -9,7 +9,7 @@ export const generateMetadata = () => {
 
 const fetchApi = async (id) => {
   let data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product/${id}`, {
-    next: { revalidate: 60 }, // Revalidate every 60 seconds
+    // next: { revalidate: 60 }, 
   });
   return await data.json();
 };

@@ -65,6 +65,7 @@ const AdvancedProductDetail = ({ data }) => {
       title: data.product.prod_name,
       price: data.product.prod_value,
       stockQuantity: data.product.stockQuantity,
+      parcel_info: data.product.parcel,
     };
  
     if (medCart) {
@@ -107,6 +108,7 @@ const AdvancedProductDetail = ({ data }) => {
             stockQuantity: c.stockQuantity,
             prescription: c.prescription,
             description: c.description,
+            parcel_info: c.parcel,
           };
         });
       } else {
