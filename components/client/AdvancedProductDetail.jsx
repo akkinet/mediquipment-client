@@ -108,7 +108,7 @@ const AdvancedProductDetail = ({ data }) => {
             stockQuantity: c.stockQuantity,
             prescription: c.prescription,
             description: c.description,
-            parcel_info: c.parcel,
+            parcel_info: c.parcel_info,
           };
         });
       } else {
