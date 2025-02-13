@@ -3,37 +3,33 @@ import jwt from "jsonwebtoken";
 import sendMail from "../../../../lib/sendMail";
 import { getBaseURL } from "../../utils";
 import bcrypt from "bcrypt";
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
-import { ddbDocClient } from "../../../../config/ddbDocClient";
+import Users from "../../../../models/Users";
 
 export const POST = async (req) => {
   try {
     const userData = await req.json();
 
-    let exUser = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/info/${userData.username}`)
+    let exUser = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/user/info/${userData.username}`
+    );
     exUser = await exUser.json();
 
-    if(!exUser?.message)
-      return NextResponse.json({error: "Username already taken"}, {status: 400})
+    if (!exUser?.message)
+      return NextResponse.json(
+        { error: "Username already taken" },
+        { status: 400 }
+      );
 
     const password = await bcrypt.hash(userData.password, 10);
     const { username, phone, email } = userData;
 
-    const dateString = new Date().toLocaleString();
-    const params = {
-      TableName: "Users",
-      Item: {
-        createdAt: dateString,
-        updatedAt: "",
-        username,
-        phone,
-        email,
-        password,
-        verified: false,
-      },
-    };
-
-    await ddbDocClient.send(new PutCommand(params));
+    await Users.create({
+      username,
+      phone,
+      email,
+      password,
+      verified: false,
+    });
 
     const token = jwt.sign(
       { username: userData.username, email: userData.email },
@@ -52,7 +48,7 @@ export const POST = async (req) => {
 
     <p>Thank you for signing up! To complete your registration, please click the button below to verify your email address:</p>
 
-    <button type="button" onclick="location.href='${baseURL}/api/auth/verify?for=email&createdAt=${dateString}&token=${token}'" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer;">
+    <button type="button" onclick="location.href='${baseURL}/api/auth/verify?for=email&token=${token}'" style="background-color: #007bff; color: white; padding: 10px 20px; border: none; cursor: pointer;">
       Verify Now
     </button>
 

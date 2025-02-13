@@ -1,29 +1,8 @@
 import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
 import { ddbDocClient } from "../../../config/ddbDocClient";
 import { NextResponse } from "next/server";
 import sendMail from "../../../lib/sendMail";
-
-const prescriptionUpload = async (file) => {
-  try {
-    const { fileName, filePreview, fileType } = file;
-    const fileBuffer = Buffer.from(filePreview, "base64");
-    const [file_name, extension] = fileName.split(".");
-    const newFileName = `${file_name}_${new Date().getTime()}.${extension}`;
-    const s3 = new S3Client();
-    const params = {
-      Bucket: "medicom.hexerve",
-      Key: newFileName,
-      Body: fileBuffer,
-      ContentType: fileType,
-    };
-    await s3.send(new PutObjectCommand(params));
-    const fileURL = `https://medicom.hexerve.s3.${process.env.AWS_REGION}.amazonaws.com/${newFileName}`;
-    return NextResponse.json({ fileURL }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-};
+import Order from "../../../models/Order";
 
 export const POST = async (req) => {
   try {
@@ -55,7 +34,6 @@ export const POST = async (req) => {
         ? "Pending"
         : "Completed",
       comment: "",
-      id: date.getTime().toString(),
       customer_email: customer.email,
       customer_name: customer.fullName,
       customer_phone: customer.phone,
@@ -86,24 +64,12 @@ export const POST = async (req) => {
 
     const parsedProdList = JSON.parse(checkout_session.metadata.products);
     for (const item of productItems) {
-      const params = {
-        TableName: "RealProducts",
-        Key: {
-          prod_id: Number(parsedProdList[item.description]),
-        },
-      };
-      const command = new GetCommand(params);
-      const result = await ddbDocClient.send(command);
-
-      const product = result.Item;
-
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/product/${product.prod_id}`,
+      const {product} = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/product/${parsedProdList[item.description]}`,
         {
           method: "PUT",
           body: JSON.stringify({
-            quantity: Number(item.quantity),
-            stockQuantity: Number(product.stockQuantity),
+            quantity: Number(item.quantity)
           }),
         }
       );
@@ -120,12 +86,8 @@ export const POST = async (req) => {
       });
     }
 
-    const command = new PutCommand({
-      TableName: "Orders",
-      Item: orderParams,
-    });
-
-    await ddbDocClient.send(command);
+    await Order.create(orderParams);
+    
     const ship = orderParams.shipping_address;
     const bill = orderParams.billing_address;
 

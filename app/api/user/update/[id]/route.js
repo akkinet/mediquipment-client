@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
-import { ddbDocClient } from "../../../../../config/ddbDocClient";
-import { UpdateCommand, GetCommand } from "@aws-sdk/lib-dynamodb";
 import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import Users from "../../../../../models/Users";
 
 export const PUT = async (req, ctx) => {
   try {
@@ -9,7 +8,6 @@ export const PUT = async (req, ctx) => {
     const file = formData.get("profile");
     let imageUrl;
 
-    // Step 1: Upload the file to S3 (if provided)
     if (file) {
       const byteData = await file.arrayBuffer();
       const Bucket = "medicom.hexerve";
@@ -23,60 +21,35 @@ export const PUT = async (req, ctx) => {
       imageUrl = `https://s3.${process.env.AWS_REGION}.amazonaws.com/${Bucket}/${Key}`;
     }
 
-    // Step 2: Prepare keys and check if the item exists
-    const createdAt = formData.get("createdAt");
     formData.delete("createdAt");
     if (file) formData.delete("profile");
 
-    const Key = {
-      username: ctx.params.id,
-      createdAt,
-    };
-
-    // Check if the item exists in the table
-    const getParams = {
-      TableName: "Users",
-      Key,
-    };
-
-    const existingItem = await ddbDocClient.send(new GetCommand(getParams));
-    if (!existingItem.Item) {
+    const existingUser = await Users.findOne({username: ctx.params.id});
+    if (!existingUser) {
       return NextResponse.json(
-        { message: "Item not found in the database" },
+        { message: "User not found in the database" },
         { status: 404 }
       );
     }
 
-    // Step 3: Prepare the update parameters dynamically
-    const updateParams = {
-      TableName: "Users",
-      Key,
-      UpdateExpression: "set",
-      ExpressionAttributeValues: {},
-      ReturnValues: "UPDATED_NEW",
-    };
-
-    let updateExpressionArray = [];
+    let updateData = {};
 
     for (const [key, value] of formData.entries()) {
-      updateExpressionArray.push(`${key} = :${key}`);
-      updateParams.ExpressionAttributeValues[`:${key}`] =
-        key === "address" ? JSON.parse(value) : value;
+      updateData[key] = key === "address" ? JSON.parse(value) : value;
     }
 
     if (file) {
-      updateExpressionArray.push(`image = :image`);
-      updateParams.ExpressionAttributeValues[`:image`] = imageUrl;
+      updateData.image = imageUrl;
     }
 
-    // Combine expressions
-    updateParams.UpdateExpression = "set " + updateExpressionArray.join(", ");
-
-    if (updateExpressionArray.length > 0) {
+    if (Object.keys(updateData).length > 0) {
       // Only update if there are fields to update
-      const user = await ddbDocClient.send(new UpdateCommand(updateParams));
+      const updatedUser = await Users.findOneAndUpdate({username: ctx.params.id}, updateData, {
+        new: true, // Return the updated document
+      });
+
       return NextResponse.json(
-        { message: "Update successful", user: {createdAt, ...user.Attributes} },
+        { message: "Update successful", user: updatedUser },
         { status: 200 }
       );
     } else {

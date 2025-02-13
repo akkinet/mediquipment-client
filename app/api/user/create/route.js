@@ -1,9 +1,8 @@
-import { PutCommand } from "@aws-sdk/lib-dynamodb";
-import { ddbDocClient } from "../../../../config/ddbDocClient";
 import { NextResponse } from "next/server";
 import { getBaseURL } from "../../utils";
 import sendMail from "../../../../lib/sendMail";
-import bcrypt from 'bcrypt';
+import bcrypt from "bcrypt";
+import Users from "../../../../models/Users";
 
 export const POST = async (req) => {
   try {
@@ -15,19 +14,14 @@ export const POST = async (req) => {
     const username = customerDetails.email.split("@")[0];
     const passwordFormed = `${username}@${customerDetails.phone.slice(-6)}`;
     const password = await bcrypt.hash(passwordFormed, 10);
-    const dateString = new Date().toLocaleString();
-    const params = {
-      TableName: "Users",
-      Item: {
-        createdAt: dateString,
-        updatedAt: "",
+  
+      const user = new Users({
         verified: false,
         username,
-        ...customerDetails,
+       ...customerDetails,
         password,
-      },
-    };
-    await ddbDocClient.send(new PutCommand(params));
+      });
+      await user.save();
 
     const baseURL = getBaseURL(req);
     const html = `<!DOCTYPE html>

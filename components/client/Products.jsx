@@ -154,8 +154,8 @@ const Products = ({ productList, brands }) => {
                   name="price"
                   id="low"
                   className='border-2 border-gray-300 accent-customBaseBlue h-4 w-4'
-                  value='{"$lt":2000}'
-                  checked={filters.price === '{"$lt":2000}'}
+                  value='{"$lt":"2000"}'
+                  checked={filters.price === '{"$lt":"2000"}'}
                   onChange={(e) => handleFilterChange(e)}
                 />
                 <label htmlFor="low" className='ml-4 text-md font-light'> less than $2000 </label>
@@ -165,9 +165,9 @@ const Products = ({ productList, brands }) => {
                   type="radio"
                   name="price"
                   id="medium"
-                  value='{"$gte":2000,"$lt":5000}'
+                  value='{"$gte":"2000","$lt":"5000"}'
                   className='border-2 border-gray-300 accent-customBaseBlue h-4 w-4'
-                  checked={filters.price === '{"$gte":2000,"$lt":5000}'}
+                  checked={filters.price === '{"$gte":"2000","$lt":"5000"}'}
                   onChange={(e) => handleFilterChange(e)}
                 />
                 <label htmlFor="medium" className='ml-4 text-md font-light'> equal or more than $2000 </label>
@@ -177,9 +177,9 @@ const Products = ({ productList, brands }) => {
                   type="radio"
                   name="price"
                   id="high"
-                  value='{"$gte":5000}'
+                  value='{"$gte":"5000"}'
                   className='border-2 border-gray-300 accent-customBaseBlue h-4 w-4'
-                  checked={filters.price === '{"$gte":5000}'}
+                  checked={filters.price === '{"$gte":"5000"}'}
                   onChange={(e) => handleFilterChange(e)}
                 />
                 <label htmlFor="high" className='ml-4 text-md font-light'> more than $5000 </label>

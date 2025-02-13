@@ -1,19 +1,19 @@
-import { NextResponse } from "next/server";
-import { ScanCommand } from "@aws-sdk/lib-dynamodb";
-import { ddbDocClient } from "../../../config/ddbDocClient";
+import Category from "../../../models/Category";
 
 export const GET = async (req) => {
   try {
     const { searchParams } = new URL(req.url);
-    const num = searchParams.get("num");
+    const num = parseInt(searchParams.get("num"));
+    
+    // Fetch a limited number of categories from MongoDB
+    const categories = await Category.find().limit(num);
 
-    const command = new ScanCommand({ TableName: "RealCategories", Limit: parseInt(num) ?? 8 });
-    const result = await ddbDocClient.send(command);
-
-    let categories = [];
-    if (result.Items && result.Items.length > 0) categories = result.Items;
-
-    return NextResponse.json(categories, { status: 200 });
+    return new Response(JSON.stringify(categories), {
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      status: 200
+    });
   } catch (error) {
     console.error("er", error);
     return new Response(JSON.stringify({ error: error.message }), {
