@@ -1,5 +1,3 @@
-import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { ddbDocClient } from "../../../config/ddbDocClient";
 import { NextResponse } from "next/server";
 import sendMail from "../../../lib/sendMail";
 import Order from "../../../models/Order";
@@ -16,8 +14,6 @@ export const POST = async (req) => {
       `${process.env.NEXT_PUBLIC_API_URL}/user/info/${customer.email}`
     );
     const user = await user_info.json();
-    customer.fullName = customer.name;
-    delete customer.name;
 
     if (user.message == "Not Found") {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/create`, {
@@ -35,7 +31,7 @@ export const POST = async (req) => {
         : "Completed",
       comment: "",
       customer_email: customer.email,
-      customer_name: customer.fullName,
+      customer_name: customer.name,
       customer_phone: customer.phone,
       order_date: date.toLocaleString(),
       shipping_address: checkout_session.shipping_details.address,
@@ -64,7 +60,7 @@ export const POST = async (req) => {
 
     const parsedProdList = JSON.parse(checkout_session.metadata.products);
     for (const item of productItems) {
-      const {product} = await fetch(
+      const prodResp = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/product/${parsedProdList[item.description]}`,
         {
           method: "PUT",
@@ -74,15 +70,17 @@ export const POST = async (req) => {
         }
       );
 
+      const product = await prodResp.json();
+
       orderParams.items.push({
-        product_id: product.prod_id,
-        product_name: product.prod_name,
-        description: product.prod_desc,
-        image: product.prod_images[0],
+        product_id: product.product.prod_id,
+        product_name: product.product.prod_name,
+        description: product.product.prod_desc,
+        image: product.product.prod_images[0],
         quantity: item.quantity,
         price: (item.amount_total / 100).toFixed(2),
-        prescription_required: product.prod_id in presItems || presItems[product.prod_id] == "",
-        prescription_file: presItems[product.prod_id] ?? "",
+        prescription_required: product.product.prod_id in presItems || presItems[product.product.prod_id] == "",
+        prescription_file: presItems[product.product.prod_id] ?? "",
       });
     }
 

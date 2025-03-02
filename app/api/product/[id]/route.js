@@ -1,7 +1,5 @@
 import { NextResponse } from "next/server";
 import { removeStopWords } from "../../../../lib/helperFunction";
-import { ddbDocClient } from "../../../../config/ddbDocClient";
-import { GetCommand, ScanCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
 import Product from "../../../../models/Product";
 
 function getUniqueObjects(arr) {
@@ -22,7 +20,7 @@ function getUniqueObjects(arr) {
 
 export const GET = async (req, ctx) => {
   try {
-    const result = await Product.findOne({prod_id: Number(ctx.params.id)})
+    const result = await Product.findOne({prod_id: ctx.params.id})
 
     const jsonRes = await fetch('https://s3.ap-south-1.amazonaws.com/medicom.hexerve/stopWords.json');
     const stopWords = await jsonRes.json();
@@ -37,7 +35,7 @@ export const GET = async (req, ctx) => {
         filterText = filterText[0].toUpperCase() + filterText.substr(1);
         
         const query = {
-          prod_id: { $ne: Number(ctx.params.id) }, // Exclude a specific prod_id
+          prod_id: { $ne: ctx.params.id }, // Exclude a specific prod_id
           prod_name: { $regex: new RegExp(filterText, "i") } // Case-insensitive search in product name
         };
         
@@ -59,8 +57,9 @@ export const GET = async (req, ctx) => {
 
 export const PUT = async (req, ctx) => {
   try {
-    const { quantity } = await req.json(); // Get quantity to reduce
+    let { quantity } = await req.json(); // Get quantity to reduce
     const productId = ctx.params.id; // Get product ID from request params
+    quantity = parseInt(quantity);
 
     if (!quantity || quantity <= 0) {
       return NextResponse.json(
@@ -88,7 +87,7 @@ export const PUT = async (req, ctx) => {
 
     // Update stock quantity by decrementing the given value
     const updatedProduct = await Product.findOneAndUpdate(
-      { prod_id: Number(productId) },
+      { prod_id: productId },
       { $inc: { stockQuantity: -quantity } }, // Reduce stock quantity
       { new: true } // Return updated product
     );

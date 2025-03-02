@@ -59,6 +59,7 @@ const OrderSchema = new mongoose.Schema({
   total_amount: { type: Number, required: true }
 }, { timestamps: true });
 
-const Order = mongoose.model("Order", OrderSchema);
+// Check if the model has already been defined
+const Order = mongoose.models.Order || mongoose.model("Order", OrderSchema, "Order");
 
 export default Order;
