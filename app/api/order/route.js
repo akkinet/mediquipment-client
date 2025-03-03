@@ -84,7 +84,7 @@ export const POST = async (req) => {
       });
     }
 
-    await Order.create(orderParams);
+    const orderCrt = await Order.create(orderParams);
     
     const ship = orderParams.shipping_address;
     const bill = orderParams.billing_address;
@@ -105,16 +105,16 @@ export const POST = async (req) => {
   <div class="container mx-auto p-6 bg-white rounded-lg shadow-md">
     <h1 class="text-3xl font-bold mb-4">Order Completed!</h1>
 
-    <p class="mb-4">Hi ${customer.fullName},</p>
+    <p class="mb-4">Hi ${customer.name},</p>
 
     <p class="mb-4">
-      This email confirms that your order (#${orderParams.id}) has been
+      This email confirms that your order (#${orderCrt._id}) has been
       successfully processed and is now complete.
     </p>
 
     <h2 class="text-xl font-semibold mb-2">Order Summary:</h2>
     <ul class="list-disc list-inside mb-4">
-      <li>Order Number: #${orderParams.id}</li>
+      <li>Order Number: #${orderCrt._id}</li>
       <li>Order Date: ${orderParams.order_date}</li>
       <li>Shipping Address: ${ship.line1}, ${
       ship.line2 ? `${ship.line2},` : ""
