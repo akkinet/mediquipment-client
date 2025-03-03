@@ -1,29 +1,6 @@
-import { GetCommand, PutCommand } from "@aws-sdk/lib-dynamodb";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { ddbDocClient } from "../../../config/ddbDocClient";
 import { NextResponse } from "next/server";
 import sendMail from "../../../lib/sendMail";
-
-const prescriptionUpload = async (file) => {
-  try {
-    const { fileName, filePreview, fileType } = file;
-    const fileBuffer = Buffer.from(filePreview, "base64");
-    const [file_name, extension] = fileName.split(".");
-    const newFileName = `${file_name}_${new Date().getTime()}.${extension}`;
-    const s3 = new S3Client();
-    const params = {
-      Bucket: "medicom.hexerve",
-      Key: newFileName,
-      Body: fileBuffer,
-      ContentType: fileType,
-    };
-    await s3.send(new PutObjectCommand(params));
-    const fileURL = `https://medicom.hexerve.s3.${process.env.AWS_REGION}.amazonaws.com/${newFileName}`;
-    return NextResponse.json({ fileURL }, { status: 200 });
-  } catch (error) {
-    return NextResponse.json({ error: error.message }, { status: 500 });
-  }
-};
+import Order from "../../../models/Order";
 
 export const POST = async (req) => {
   try {
@@ -37,8 +14,6 @@ export const POST = async (req) => {
       `${process.env.NEXT_PUBLIC_API_URL}/user/info/${customer.email}`
     );
     const user = await user_info.json();
-    customer.fullName = customer.name;
-    delete customer.name;
 
     if (user.message == "Not Found") {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/create`, {
@@ -55,9 +30,8 @@ export const POST = async (req) => {
         ? "Pending"
         : "Completed",
       comment: "",
-      id: date.getTime().toString(),
       customer_email: customer.email,
-      customer_name: customer.fullName,
+      customer_name: customer.name,
       customer_phone: customer.phone,
       order_date: date.toLocaleString(),
       shipping_address: checkout_session.shipping_details.address,
@@ -86,46 +60,32 @@ export const POST = async (req) => {
 
     const parsedProdList = JSON.parse(checkout_session.metadata.products);
     for (const item of productItems) {
-      const params = {
-        TableName: "RealProducts",
-        Key: {
-          prod_id: Number(parsedProdList[item.description]),
-        },
-      };
-      const command = new GetCommand(params);
-      const result = await ddbDocClient.send(command);
-
-      const product = result.Item;
-
-      await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/product/${product.prod_id}`,
+      const prodResp = await fetch(
+        `${process.env.NEXT_PUBLIC_API_URL}/product/${parsedProdList[item.description]}`,
         {
           method: "PUT",
           body: JSON.stringify({
-            quantity: Number(item.quantity),
-            stockQuantity: Number(product.stockQuantity),
+            quantity: Number(item.quantity)
           }),
         }
       );
 
+      const product = await prodResp.json();
+
       orderParams.items.push({
-        product_id: product.prod_id,
-        product_name: product.prod_name,
-        description: product.prod_desc,
-        image: product.prod_images[0],
+        product_id: product.product.prod_id,
+        product_name: product.product.prod_name,
+        description: product.product.prod_desc,
+        image: product.product.prod_images[0],
         quantity: item.quantity,
         price: (item.amount_total / 100).toFixed(2),
-        prescription_required: presItems[product.prod_id] ? true : false,
-        prescription_file: presItems[product.prod_id] ?? "",
+        prescription_required: product.product.prod_id in presItems || presItems[product.product.prod_id] == "",
+        prescription_file: presItems[product.product.prod_id] ?? "",
       });
     }
 
-    const command = new PutCommand({
-      TableName: "Orders",
-      Item: orderParams,
-    });
-
-    await ddbDocClient.send(command);
+    const orderCrt = await Order.create(orderParams);
+    
     const ship = orderParams.shipping_address;
     const bill = orderParams.billing_address;
 
@@ -145,16 +105,16 @@ export const POST = async (req) => {
   <div class="container mx-auto p-6 bg-white rounded-lg shadow-md">
     <h1 class="text-3xl font-bold mb-4">Order Completed!</h1>
 
-    <p class="mb-4">Hi ${customer.fullName},</p>
+    <p class="mb-4">Hi ${customer.name},</p>
 
     <p class="mb-4">
-      This email confirms that your order (#${orderParams.id}) has been
+      This email confirms that your order (#${orderCrt._id}) has been
       successfully processed and is now complete.
     </p>
 
     <h2 class="text-xl font-semibold mb-2">Order Summary:</h2>
     <ul class="list-disc list-inside mb-4">
-      <li>Order Number: #${orderParams.id}</li>
+      <li>Order Number: #${orderCrt._id}</li>
       <li>Order Date: ${orderParams.order_date}</li>
       <li>Shipping Address: ${ship.line1}, ${
       ship.line2 ? `${ship.line2},` : ""

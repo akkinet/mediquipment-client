@@ -340,9 +340,9 @@ const AdvancedProductDetail = ({ data }) => {
                 {data.product.prod_detailed_desc.map((dtl, i) => (
                   <li key={i}>
                     <p className="my-2 text-xl font-bold ml-2">
-                      {Object.keys(dtl)[0]}
+                      {Object.keys(dtl)[1]}
                     </p>
-                    <p>{Object.values(dtl)[0]}</p>
+                    <p>{Object.values(dtl)[1]}</p>
                   </li>
                 ))}
               </ul>

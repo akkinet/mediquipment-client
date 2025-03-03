@@ -15,23 +15,21 @@ export const POST = async (req) => {
         { status: 400 }
       );
 
-    const correctPass = bcrypt.compare(password, user.password);
+    const correctPass = await bcrypt.compare(password, user.password);
+
     if (!correctPass)
       return NextResponse.json(
         { error: "invalid credentials" },
         { status: 400 }
       );
 
-    const chosenField = ["fullName", "username", "email", "image", "createdAt"];
+    const chosenField = ["fullName", "username", "email", "image"];
 
     user = Object.fromEntries(
       Object.entries(user)
         .filter((u) => chosenField.includes(u[0]))
         .map((f) => [f[0], f[1]])
     );
-
-    // if(user?.firstName || user?.lastName)
-    //   user.name = (user?.firstName + " " + user?.lastName).trim() 
       
     return NextResponse.json(user, { status: 200 });
   } catch (err) {

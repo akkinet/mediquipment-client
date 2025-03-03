@@ -1,11 +1,20 @@
 import { NextResponse } from "next/server";
-import { getUser } from "../../../../../lib/db-utils";
+import Users from "../../../../../models/Users";
 
 export const GET = async (req, ctx) => {
   try {
     const info = ctx.params.id;
 
-    const user = await getUser(info);
+    const user = await Users.findOne(
+      {
+        $or: [{ username: info }, { email: info }],
+      },
+      {
+        createdAt: 0,
+        updatedAt: 0,
+        verified: 0,
+      }
+    );
 
     if (user) {
       return NextResponse.json(user, { status: 200 });

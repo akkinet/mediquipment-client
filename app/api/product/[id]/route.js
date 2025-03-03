@@ -1,7 +1,6 @@
 import { NextResponse } from "next/server";
 import { removeStopWords } from "../../../../lib/helperFunction";
-import { ddbDocClient } from "../../../../config/ddbDocClient";
-import { GetCommand, ScanCommand, UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import Product from "../../../../models/Product";
 
 function getUniqueObjects(arr) {
   const uniqueObjects = [];
@@ -21,41 +20,27 @@ function getUniqueObjects(arr) {
 
 export const GET = async (req, ctx) => {
   try {
-    const params = {
-      TableName: "RealProducts",
-      Key: {
-        prod_id: Number(ctx.params.id),
-      },
-    };
-    const command = new GetCommand(params);
-    const result = await ddbDocClient.send(command);
+    const result = await Product.findOne({prod_id: ctx.params.id})
 
     const jsonRes = await fetch('https://s3.ap-south-1.amazonaws.com/medicom.hexerve/stopWords.json');
     const stopWords = await jsonRes.json();
 
-    if (result.Item) {
-      const product = result.Item;
+    if (Object.keys(result).length > 0) {
+      const product = result;
       let relatedProducts = [];
 
       const filteredText = removeStopWords(product.prod_name, stopWords);
       for (const text of filteredText.trim().split(" ")) {
         let filterText = text.trim();
         filterText = filterText[0].toUpperCase() + filterText.substr(1);
-        const params = {
-          TableName: "RealProducts",
-          FilterExpression: "#qid <> :qidval AND contains(#qtitle, :qtitleval)",
-          ExpressionAttributeNames: {
-            "#qid": "prod_id",
-            "#qtitle": "prod_name",
-          },
-          ExpressionAttributeValues: {
-            ":qidval": Number(ctx.params.id),
-            ":qtitleval": filterText,
-          },
+        
+        const query = {
+          prod_id: { $ne: ctx.params.id }, // Exclude a specific prod_id
+          prod_name: { $regex: new RegExp(filterText, "i") } // Case-insensitive search in product name
         };
-        const command = new ScanCommand(params);
-        const result = await ddbDocClient.send(command);
-        if (result.Items) relatedProducts.push(...result.Items);
+        
+        const products = await Product.find(query);
+        if (products) relatedProducts.push(...products);
       }
       relatedProducts = getUniqueObjects(relatedProducts);
       return NextResponse.json({ product, relatedProducts }, { status: 200 });
@@ -72,21 +57,45 @@ export const GET = async (req, ctx) => {
 
 export const PUT = async (req, ctx) => {
   try {
-    const { stockQuantity, quantity } = await req.json();
+    let { quantity } = await req.json(); // Get quantity to reduce
+    const productId = ctx.params.id; // Get product ID from request params
+    quantity = parseInt(quantity);
 
-    const params = {
-      TableName: "RealProducts",
-      Key: {
-        prod_id: Number(ctx.params.id),
-      },
-      UpdateExpression: "set stockQuantity = :stockQuantity",
-      ExpressionAttributeValues: { ":stockQuantity": stockQuantity - quantity },
-      ReturnValues: "UPDATED_NEW",
-    };
+    if (!quantity || quantity <= 0) {
+      return NextResponse.json(
+        { message: "Invalid quantity value" },
+        { status: 400 }
+      );
+    }
 
-    await ddbDocClient.send(new UpdateCommand(params));
+    // Find the product and check stock availability
+    const product = await Product.findOne({ prod_id: productId });
 
-    return NextResponse.json({ message: "success" }, { status: 200 });
+    if (!product) {
+      return NextResponse.json(
+        { message: "Product not found" },
+        { status: 404 }
+      );
+    }
+
+    if (product.stockQuantity < quantity) {
+      return NextResponse.json(
+        { message: "Insufficient stock" },
+        { status: 400 }
+      );
+    }
+
+    // Update stock quantity by decrementing the given value
+    const updatedProduct = await Product.findOneAndUpdate(
+      { prod_id: productId },
+      { $inc: { stockQuantity: -quantity } }, // Reduce stock quantity
+      { new: true } // Return updated product
+    );
+
+    return NextResponse.json(
+      { message: "Stock updated successfully", product: updatedProduct },
+      { status: 200 }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: error.message }, { status: 500 });

@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
-import { ddbDocClient } from "../../../config/ddbDocClient";
-import { UpdateCommand } from "@aws-sdk/lib-dynamodb";
+import Cart from "../../../models/Cart";
 
 export const POST = async (req) => {
   try {
@@ -9,7 +8,6 @@ export const POST = async (req) => {
       prescription,
       prod_value,
       quantity,
-      stockQuantity,
       prod_name,
       prod_id,
       prod_desc,
@@ -22,28 +20,27 @@ export const POST = async (req) => {
       prescription,
       description: prod_desc,
       price: prod_value,
-      stockQuantity,
       title: prod_name,
       product_id: prod_id,
     };
 
-    const params = {
-      TableName: "Cart",
-      Key: { email },
-      UpdateExpression: 'SET #items = list_append(if_not_exists(#items, :empty_list), :items)',
-      ExpressionAttributeNames: {
-        '#items': 'items' 
-      },
-      ExpressionAttributeValues: {
-        ':items': [itemToAdd], // Add the product as an array element
-        ':empty_list': [] 
-      },
-      ReturnValues: 'UPDATED_NEW'
-    };
+    const result = await Cart.findOneAndUpdate(
+      { email: email }, // Filter to find the document by email
+      { $push: { items: itemToAdd } }, // Push the new item to the items array
+      { new: true, upsert: true } // Options to return the new document and create it if it doesn't exist
+    );
 
-    await ddbDocClient.send(new UpdateCommand(params));
-
-    return NextResponse.json({ message: "Product is Added." }, { status: 200 });
+    if (result) {
+      console.log("Updated document:", result);
+      return NextResponse.json({
+        message: "Item added to cart successfully",
+        updatedCart: result.items,
+      });
+    }
+    return NextResponse.json(
+      { message: "Failed to add item to cart" },
+      { status: 404 }
+    );
   } catch (error) {
     console.error(error);
     return NextResponse.json({ error: error.message }, { status: 500 });
