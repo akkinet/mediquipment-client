@@ -27,16 +27,14 @@ export const PUT = async (req, ctx) => {
 
 export const GET = async (req, ctx) => {
   try {
-    const params = {
-      TableName: "Cart",
-      Key: {
-        email: ctx.params.user,
-      },
-    };
-    const result = await ddbDocClient.send(new GetCommand(params));
-    const cart = result.Item ? result.Item.items ?? [] : [];
+    // Fetch the cart for the specified user
+    const cart = await Cart.findOne(
+      { email: ctx.params.user },
+      { projection: { items: 1, _id: 0 } }
+    );
 
-    return NextResponse.json(cart, { status: 200 });
+    // Return the cart items or an empty array if no cart is found
+    return NextResponse.json(cart?.items || [], { status: 200 });
   } catch (error) {
     console.error(error);
     return new Response(error.message, { status: 500 });
@@ -46,55 +44,41 @@ export const GET = async (req, ctx) => {
 export const DELETE = async (req, ctx) => {
   try {
     const { searchParams } = new URL(req.url);
-    const product_id = searchParams.get("product_id");
+    const product_id = searchParams.get('product_id');
+    const userEmail = ctx.params.user;
 
     if (!product_id) {
-      await ddbDocClient.send(
-        new DeleteCommand({
-          TableName: "Cart",
-          Key: { email: ctx.params.user },
-        })
-      );
+      // If no product_id is provided, delete the entire cart for the user
+      await Cart.deleteOne({ email: userEmail });
       return NextResponse.json([], { status: 200 });
     }
 
-    const result = await ddbDocClient.send(
-      new GetCommand({ TableName: "Cart", Key: { email: ctx.params.user } })
-    );
+    // Find the cart for the user
+    const cart = await Cart.findOne({ email: userEmail });
 
-    if (result.Item) {
-      const itemList = result.Item ? result.Item.items : [];
-      const productIndex = itemList.findIndex(
-        (item) => item.product_id == product_id
-      );
-
-      if (productIndex !== -1) {
-        const params = {
-          TableName: "Cart",
-          Key: { email: ctx.params.user },
-          UpdateExpression: `REMOVE #items[${productIndex}]`,
-          ExpressionAttributeNames: {
-            "#items": "items",
-          },
-          ExpressionAttributeValues: {
-            ":productExists": itemList[productIndex],
-          },
-          ConditionExpression:
-            "attribute_exists(#items) AND contains(#items, :productExists)",
-          ReturnValues: "UPDATED_NEW",
-        };
-
-        await ddbDocClient.send(new UpdateCommand(params));
-
-        return NextResponse.json({ message: "deleted" });
-      }
-
-      return NextResponse.json({ message: "bad request" }, { status: 400 });
+    if (!cart) {
+      return NextResponse.json({ message: 'no such user' }, { status: 404 });
     }
 
-    return NextResponse.json({ message: "no such user" }, { status: 404 });
+    // Find the index of the product in the items array
+    const productIndex = cart.items.findIndex(
+      (item) => item.product_id.toString() === product_id
+    );
+
+    if (productIndex === -1) {
+      return NextResponse.json({ message: 'bad request' }, { status: 400 });
+    }
+
+    // Remove the product from the items array
+    cart.items.splice(productIndex, 1);
+
+    // Save the updated cart
+    await cart.save();
+
+    return NextResponse.json({ message: 'deleted' }, { status: 200 });
   } catch (error) {
     console.error(error);
     return new Response(error.message, { status: 500 });
   }
 };
+

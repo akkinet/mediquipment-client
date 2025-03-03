@@ -1,5 +1,3 @@
-import { QueryCommand, ScanCommand } from "@aws-sdk/lib-dynamodb";
-import { ddbDocClient } from "../../../../config/ddbDocClient";
 import { NextResponse } from "next/server";
 import Order from "../../../../models/Order";
 
