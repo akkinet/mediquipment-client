@@ -7,45 +7,68 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
   const [insuranceOption, setInsuranceOption] = useState("no-insurance"); // State for insurance options
   const [selectedInsurance, setSelectedInsurance] = useState(""); // Selected insurance company
   const [insuranceFile, setInsuranceFile] = useState(null); // Insurance file
-  const [isCheckoutDisabled, setIsCheckoutDisabled] = useState(true); // Insurance file
+  const [isCheckoutDisabled, setIsCheckoutDisabled] = useState(true);
   const [sameFile, setSameFile] = useState(null);
+
+  // Filter out cart items that need prescription
   const [prescriptionItems, setPrescriptionItems] = useState(
     cart.length > 0 ? cart.filter((item) => item.prescription) : []
   );
+
   const fileInputRefs = useRef([]);
   const sameRef = useRef(null);
   const router = useRouter();
 
+  // --------------------------------------------------
+  // 1) Disabling Checkout button logic
+  // --------------------------------------------------
   const checkDisabled = (later, file) => {
     const full =
       fileInputRefs.current.length > 0 &&
-      fileInputRefs.current.every((file) => file && file.value != "");
-    if (full || file || later || prescriptionItems.length == 0)
+      fileInputRefs.current.every((file) => file && file.value !== "");
+    // If user has uploaded all prescription files,
+    // or is using a single file for all,
+    // or has chosen "upload later" (meaning no files needed right now),
+    // or there are no prescription items at all,
+    // then button is enabled.
+    if (full || file || later || prescriptionItems.length === 0) {
       setIsCheckoutDisabled(false);
-    else setIsCheckoutDisabled(true);
+    } else {
+      setIsCheckoutDisabled(true);
+    }
   };
 
   useEffect(() => {
     checkDisabled(uploadLater, sameFile);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [fileInputRefs, uploadLater, sameFile, prescriptionItems, isModalOpen]);
 
-  if (!isModalOpen) return;
+  // If modal is closed, don't render it
+  if (!isModalOpen) return null;
 
+  // --------------------------------------------------
+  // 2) Clearing any existing file inputs
+  // --------------------------------------------------
   const clearList = () => {
-    if (fileInputRefs.current.length > 0)
-      for (const file of fileInputRefs.current) file.value = "";
+    if (fileInputRefs.current.length > 0) {
+      for (const file of fileInputRefs.current) {
+        if (file) file.value = "";
+      }
+    }
   };
 
+  // --------------------------------------------------
+  // 3) Per-item file upload
+  // --------------------------------------------------
   const handleFileChange = (index, e) => {
     const file = e.target.files[0];
     if (file) {
       const reader = new FileReader();
 
       reader.onloadend = () => {
-        const duplicate = [...prescriptionItems];
-        const target = duplicate[index];
-        duplicate[index] = {
-          ...target,
+        const updated = [...prescriptionItems];
+        updated[index] = {
+          ...updated[index],
           file: {
             fileName: file.name,
             fileSize: file.size,
@@ -53,8 +76,7 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
             filePreview: reader.result,
           },
         };
-
-        setPrescriptionItems(duplicate);
+        setPrescriptionItems(updated);
       };
 
       reader.readAsDataURL(file);
@@ -62,43 +84,64 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
     }
   };
 
+  // --------------------------------------------------
+  // 4) Single-file-for-all logic
+  // --------------------------------------------------
   const sameUploadHandler = () => {
     setSameFileForAll(!sameFileForAll);
+    // If turning on the 'sameFileForAll' option:
     if (!sameFileForAll) {
-      setUploadLater(false); // Uncheck the uploadLater option if this is checked
-      const duplicate = [...prescriptionItems];
+      // We must also uncheck 'uploadLater'
+      setUploadLater(false);
 
+      // Remove existing files from each item so we don't double upload
+      const duplicate = [...prescriptionItems];
       for (const c of duplicate) {
         if (c.file) {
           delete c.file;
         }
       }
-
       setPrescriptionItems(duplicate);
     } else {
+      // If turning off the 'sameFileForAll' option:
       setSameFile(null);
       if (sameRef.current) sameRef.current.value = "";
     }
-
+    // Always clear existing file inputs
     clearList();
   };
 
+  const sameFileUploader = (e) => {
+    const file = e.target.files[0];
+    setSameFile(file);
+  };
+
+  // --------------------------------------------------
+  // 5) Upload-later logic
+  // --------------------------------------------------
   const updloadLaterHandler = () => {
     setUploadLater(!uploadLater);
+    // If turning on the 'uploadLater' option:
     if (!uploadLater) {
+      // Clear out previously attached files
       const duplicate = [...prescriptionItems];
       for (const c of duplicate) {
         if (c.file) delete c.file;
       }
       setPrescriptionItems(duplicate);
-      setSameFileForAll(false); // Uncheck the sameFileForAll option if this is checked
+
+      // Also uncheck 'sameFileForAll'
+      setSameFileForAll(false);
       setSameFile(null);
       if (sameRef.current) sameRef.current.value = "";
     }
-
+    // Clear existing file inputs
     clearList();
   };
 
+  // --------------------------------------------------
+  // 6) Insurance upload
+  // --------------------------------------------------
   const handleInsuranceUpload = (e) => {
     const file = e.target.files[0];
     if (file) {
@@ -117,25 +160,44 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
     }
   };
 
+  // --------------------------------------------------
+  // 7) Close modal
+  // --------------------------------------------------
   const closeModal = () => {
     setIsModalOpen(false);
     setIsCheckoutDisabled(true);
   };
 
+  // --------------------------------------------------
+  // 8) Checkout Handler
+  // --------------------------------------------------
   const checkoutHandler = async () => {
-    let lineItems = [],
-      metadata = {};
-    let file = "";
-    const metaProd = {};
-
-    if(insuranceOption == "upload" && (!insuranceFile || selectedInsurance == "")){
-        alert("missing fields!");
-        return;
+    // --------------------------
+    // A) Basic validation
+    // --------------------------
+    if (
+      insuranceOption === "upload" &&
+      (!insuranceFile || selectedInsurance === "")
+    ) {
+      alert("Please select an insurance company and upload a file.");
+      return;
     }
 
+    // --------------------------
+    // B) Build line items & metadata
+    // --------------------------
+    let lineItems = [];
+    let metadata = {};
+    let file = ""; // Will hold the final prescription file URL (if using single-file-for-all)
+    const metaProd = {};
+
+    // (i) If there are prescription items
     if (prescriptionItems.length > 0) {
       metadata.prescription_required = true;
       const uploadedAll = prescriptionItems.every((p) => p.file);
+      // If "sameFileForAll" with an actual file => "Received"
+      // If every item has an uploaded file => "Received"
+      // Otherwise => "Pending"
       metadata.prescription_status = sameFile
         ? "Received"
         : uploadedAll
@@ -147,10 +209,12 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
       metadata.prescription_status = "";
     }
 
+    // (ii) If "sameFileForAll" is on, we upload that single file
     if (sameFileForAll && sameFile) {
       const formData = new FormData();
       formData.set("profile", sameFile);
 
+      // Example: your server route to upload image
       const imgRes = await fetch("/api/user/image", {
         method: "POST",
         body: formData,
@@ -159,12 +223,18 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
       file = secureUrl;
     }
 
+    // (iii) Build line items from cart
     for (const item of cart) {
       metaProd[item.title] = item.product_id;
+
+      // If item requires a prescription, upload the file
       if (item.prescription) {
+        // Find the item in "prescriptionItems"
         const itemToUpdate = prescriptionItems.find(
-          (c) => c.product_id == item.product_id
+          (c) => c.product_id === item.product_id
         );
+
+        // If that item has a file, upload it
         if (itemToUpdate?.file) {
           const res = await fetch("/api/upload", {
             method: "POST",
@@ -173,9 +243,11 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
           const { fileURL } = await res.json();
           file = fileURL;
         }
+        // Or if sameFileForAll was used, we already have 'file'
         metadata.prescription_items[item.product_id] = file;
       }
 
+      // Add to Stripe line_items
       lineItems.push({
         price_data: {
           currency: "usd",
@@ -184,52 +256,72 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
             description: item.description,
             images: item.images,
           },
-          unit_amount: item.price * 100,
+          unit_amount: Math.round(item.price * 100), // convert to cents
         },
-        quantity: parseInt(item.quantity),
+        quantity: parseInt(item.quantity, 10),
         adjustable_quantity: {
           enabled: true,
         },
       });
     }
 
-    if (metadata?.prescription_items)
+    // (iv) If we used prescription_items, store it as JSON
+    if (metadata?.prescription_items) {
       metadata.prescription_items = JSON.stringify(metadata.prescription_items);
-    metadata.products = JSON.stringify(metaProd);
-    const checkoutObj = {
-      line_items: lineItems,
-      metadata,
-    };
-    if (email) checkoutObj.email = email;
+    }
 
-    if(insuranceOption == "upload"){
+    // (v) Store product IDs
+    metadata.products = JSON.stringify(metaProd);
+
+    // (vi) If user selected insurance
+    if (insuranceOption === "upload") {
+      // Upload the insurance file
       const res = await fetch("/api/upload", {
         method: "POST",
         body: JSON.stringify(insuranceFile),
       });
       const { fileURL } = await res.json();
-      const inc = fileURL;
-      metadata.insurance_file = inc;
+      metadata.insurance_file = fileURL;
       metadata.insurance_company = selectedInsurance;
     }
 
-    const checkoutResponse = await fetch("/api/stripe/checkout", {
-      method: "POST",
-      body: JSON.stringify(checkoutObj),
-    });
-    const { session } = await checkoutResponse.json();
+    // (vii) Build final checkout obj
+    const checkoutObj = {
+      line_items: lineItems,
+      metadata,
+    };
+    if (email) {
+      checkoutObj.email = email;
+    }
 
-    router.push(session.url);
+    // --------------------------
+    // C) Determine total cart amount
+    // --------------------------
+    const totalCartValue = cart.reduce((acc, item) => {
+      return acc + item.price * item.quantity;
+    }, 0);
+    
+    if (totalCartValue < 500) {
+      // Take user to your shipping page
+      router.push("/package-shipment");
+    } else {
+      // Go directly to Stripe
+      const checkoutResponse = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        body: JSON.stringify(checkoutObj),
+      });
+      const { session } = await checkoutResponse.json();
+      router.push(session.url);
+    }
   };
 
-  const sameFileUploader = (e) => {
-    const file = e.target.files[0];
-    setSameFile(file);
-  };
-
+  // --------------------------------------------------
+  // Render
+  // --------------------------------------------------
   return (
-    <div className="fixed  !ml-0 z-50 flex items-center justify-center bg-black bg-opacity-50 w-[100vw] h-[100vh] top-0 left-0">
+    <div className="fixed z-50 flex items-center justify-center bg-black bg-opacity-50 w-[100vw] h-[100vh] top-0 left-0">
       <div className="bg-white w-full max-w-5xl p-6 rounded-lg shadow-lg relative">
+        {/* 1) Only show the prescription table if we have prescriptionItems */}
         {prescriptionItems.length > 0 && (
           <>
             <h2 className="text-lg font-semibold mb-4">Upload Prescription</h2>
@@ -252,7 +344,7 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
                 </thead>
                 <tbody>
                   {prescriptionItems.map((item, index) => (
-                    <tr key={index} className="text-center">
+                    <tr key={item.product_id} className="text-center">
                       <td className="border border-gray-300 p-2">
                         {index + 1}.
                       </td>
@@ -260,29 +352,29 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
                         <img
                           src={item.images[0]}
                           alt={item.title}
-                          className="h-10 w-10 rounded-lg object-contain "
+                          className="h-10 w-10 rounded-lg object-contain"
                         />
                       </td>
                       <td className="border border-gray-300 p-2">
                         {item.title}
                       </td>
                       <td className="border border-gray-300 p-2">
-                      {item.price.toLocaleString(undefined, {
-                        minimumFractionDigits: 2,
-                        maximumFractionDigits: 2
-                      })}
+                        {item.price.toLocaleString(undefined, {
+                          minimumFractionDigits: 2,
+                          maximumFractionDigits: 2,
+                        })}
                       </td>
                       <td className="border border-gray-300 p-2">
                         {item.quantity}
                       </td>
                       <td className="border border-gray-300 p-2">
-                        <div className=" flex items-center justify-center p-1 box-border">
+                        <div className="flex items-center justify-center p-1 box-border">
                           <input
                             type="file"
                             ref={(el) => (fileInputRefs.current[index] = el)}
                             disabled={uploadLater || sameFileForAll}
                             onChange={(event) => handleFileChange(index, event)}
-                            className=" file:rounded file:px-4 file:h-8 file:cursor-pointer file:bg-white file:border file:border-gray-400 file:shadow file:mr-4 file:transition file:duration-200 hover:file:bg-customBlue hover:file:text-white active:file:bg-gray-300"
+                            className="file:rounded file:px-4 file:h-8 file:cursor-pointer file:bg-white file:border file:border-gray-400 file:shadow file:mr-4 file:transition file:duration-200 hover:file:bg-customBlue hover:file:text-white active:file:bg-gray-300"
                           />
                         </div>
                       </td>
@@ -292,7 +384,7 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
               </table>
             </div>
 
-            {/* Checkbox for same prescription */}
+            {/* 2) Same prescription for all checkbox */}
             {prescriptionItems.length > 1 && (
               <div className="flex justify-between">
                 <div className="mt-4">
@@ -318,14 +410,14 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
                       type="file"
                       ref={sameRef}
                       onChange={sameFileUploader}
-                      className=" file:rounded file:px-4 file:h-8 file:cursor-pointer file:bg-white file:border file:border-gray-400 file:shadow file:mr-4 file:transition file:duration-200 hover:file:bg-customBlue hover:file:text-white active:file:bg-gray-300"
+                      className="file:rounded file:px-4 file:h-8 file:cursor-pointer file:bg-white file:border file:border-gray-400 file:shadow file:mr-4 file:transition file:duration-200 hover:file:bg-customBlue hover:file:text-white active:file:bg-gray-300"
                     />
                   </div>
                 )}
               </div>
             )}
 
-            {/* Checkbox for upload prescription later */}
+            {/* 3) Upload prescription later */}
             <div className="mt-4">
               <label className="inline-flex items-center">
                 <input
@@ -340,10 +432,9 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
           </>
         )}
 
+        {/* 4) Insurance selection */}
         <div className="mt-4">
-          <h2 className="text-lg font-semibold my-3">
-            Choose insurance option
-          </h2>
+          <h2 className="text-lg font-semibold my-3">Choose insurance option</h2>
           <div className="mt-2">
             <label className="inline-flex items-center mr-4">
               <input
@@ -391,7 +482,7 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
                 </select>
                 <input
                   type="file"
-                  className="ml-4 block text-sm text-gray-900   file:rounded file:px-4 file:h-8 file:cursor-pointer file:bg-white file:border file:border-gray-400 file:shadow file:mr-4 file:transition file:duration-200 hover:file:bg-customBlue hover:file:text-white active:file:bg-gray-300"
+                  className="ml-4 block text-sm text-gray-900 file:rounded file:px-4 file:h-8 file:cursor-pointer file:bg-white file:border file:border-gray-400 file:shadow file:mr-4 file:transition file:duration-200 hover:file:bg-customBlue hover:file:text-white active:file:bg-gray-300"
                   onChange={handleInsuranceUpload}
                 />
               </div>
@@ -399,6 +490,7 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
           )}
         </div>
 
+        {/* 5) Buttons */}
         <div className="flex justify-end mt-4 space-x-2">
           <button
             className="bg-red-500 text-white rounded-lg px-4 py-2"

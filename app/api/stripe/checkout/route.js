@@ -15,9 +15,9 @@ export const POST = async (req) => {
       phone_number_collection: {
         enabled: true,
       },
-      // automatic_tax: {
-      //     enabled: true,
-      // },
+      automatic_tax: {
+          enabled: true,
+      },
       payment_method_types: ["card", "us_bank_account", "amazon_pay"],
       shipping_address_collection: {
         allowed_countries: ["US"],
