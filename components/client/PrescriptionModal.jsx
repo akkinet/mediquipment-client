@@ -14,7 +14,6 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
   const [prescriptionItems, setPrescriptionItems] = useState(
     cart.length > 0 ? cart.filter((item) => item.prescription) : []
   );
-
   const fileInputRefs = useRef([]);
   const sameRef = useRef(null);
   const router = useRouter();
@@ -188,33 +187,25 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
     // --------------------------
     let lineItems = [];
     let metadata = {};
-    let file = ""; // Will hold the final prescription file URL (if using single-file-for-all)
+    let file = ""; 
     const metaProd = {};
-
-    // (i) If there are prescription items
     if (prescriptionItems.length > 0) {
       metadata.prescription_required = true;
       const uploadedAll = prescriptionItems.every((p) => p.file);
-      // If "sameFileForAll" with an actual file => "Received"
-      // If every item has an uploaded file => "Received"
-      // Otherwise => "Pending"
+   
       metadata.prescription_status = sameFile
         ? "Received"
         : uploadedAll
-        ? "Received"
-        : "Pending";
+          ? "Received"
+          : "Pending";
       metadata.prescription_items = {};
     } else {
       metadata.prescription_required = false;
       metadata.prescription_status = "";
     }
-
-    // (ii) If "sameFileForAll" is on, we upload that single file
     if (sameFileForAll && sameFile) {
       const formData = new FormData();
       formData.set("profile", sameFile);
-
-      // Example: your server route to upload image
       const imgRes = await fetch("/api/user/image", {
         method: "POST",
         body: formData,
@@ -300,7 +291,7 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
     const totalCartValue = cart.reduce((acc, item) => {
       return acc + item.price * item.quantity;
     }, 0);
-    
+
     if (totalCartValue < 500) {
       // Take user to your shipping page
       router.push("/package-shipment");
@@ -314,7 +305,6 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
       router.push(session.url);
     }
   };
-
   // --------------------------------------------------
   // Render
   // --------------------------------------------------
@@ -326,9 +316,8 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
           <>
             <h2 className="text-lg font-semibold mb-4">Upload Prescription</h2>
             <div
-              className={`overflow-x-auto ${
-                prescriptionItems.length > 3 ? "overflow-y-auto" : ""
-              }`}
+              className={`overflow-x-auto ${prescriptionItems.length > 3 ? "overflow-y-auto" : ""
+                }`}
               style={{ maxHeight: "250px" }}
             >
               <table className="w-full border-collapse border border-gray-300">
@@ -500,11 +489,10 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
           </button>
 
           <button
-            className={`${
-              isCheckoutDisabled
+            className={`${isCheckoutDisabled
                 ? "bg-gray-400 cursor-not-allowed"
                 : "bg-customBlue hover:bg-customPink"
-            } text-white rounded-lg px-4 py-2`}
+              } text-white rounded-lg px-4 py-2`}
             onClick={checkoutHandler}
             disabled={isCheckoutDisabled}
           >

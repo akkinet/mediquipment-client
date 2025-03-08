@@ -1,6 +1,6 @@
 "use client";
-
 import { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
@@ -10,8 +10,9 @@ export default function BorderfreeStyleCheckout() {
   // =========================================================
   // 1) State
   // =========================================================
+  const router = useRouter();
   const [receiver, setReceiver] = useState({
-    email: "test@example.com",
+    email: "",
     firstName: "John",
     lastName: "Doe",
     address: "123 Main St",
@@ -22,28 +23,16 @@ export default function BorderfreeStyleCheckout() {
     phone: "5551234567",
     location: "US",
   });
-
-  // Array of parcels (for Shippo)
   const [parcels, setParcels] = useState([]);
-
-  // Shipment object from /api/shipment call (includes rates)
   const [shipment, setShipment] = useState(null);
-
-  // Selected shipping rate
   const [selectedRate, setSelectedRate] = useState(null);
-
-  // Tracking info
-  const [trackingInfo, setTrackingInfo] = useState(null);
-  const [trackingError, setTrackingError] = useState("");
-
-  // Cart items from localStorage
   const [cartItems, setCartItems] = useState([]);
 
-  // Loading/spinner states
+  // This tracks whether we’re busy fetching rates or finalizing the checkout
+  const [isFetchingRates, setIsFetchingRates] = useState(false);
   const [isCreatingShipment, setIsCreatingShipment] = useState(false);
-  const [isTracking, setIsTracking] = useState(false);
 
-  // Recommended address suggestion (from Shippo)
+  // For address suggestions
   const [addressSuggestions, setAddressSuggestions] = useState([]);
   const [showSuggestions, setShowSuggestions] = useState(false);
   const suggestionsRef = useRef(null);
@@ -78,7 +67,10 @@ export default function BorderfreeStyleCheckout() {
   // Close the suggestions dropdown if the user clicks outside
   useEffect(() => {
     const handleClickOutside = (event) => {
-      if (suggestionsRef.current && !suggestionsRef.current.contains(event.target)) {
+      if (
+        suggestionsRef.current &&
+        !suggestionsRef.current.contains(event.target)
+      ) {
         setShowSuggestions(false);
       }
     };
@@ -93,7 +85,12 @@ export default function BorderfreeStyleCheckout() {
   //    once the address is reasonably complete
   // =========================================================
   useEffect(() => {
-    if (receiver.address && receiver.city && receiver.region && receiver.postalCode) {
+    if (
+      receiver.address &&
+      receiver.city &&
+      receiver.region &&
+      receiver.postalCode
+    ) {
       fetchRates();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -101,10 +98,8 @@ export default function BorderfreeStyleCheckout() {
 
   const fetchRates = async () => {
     try {
-      setIsCreatingShipment(true);
+      setIsFetchingRates(true);
       setSelectedRate(null);
-      setTrackingInfo(null);
-      setTrackingError("");
 
       const shipmentData = {
         address_from: {
@@ -153,66 +148,71 @@ export default function BorderfreeStyleCheckout() {
       console.error("Error fetching rates:", error);
       setShipment(null);
     } finally {
-      setIsCreatingShipment(false);
+      setIsFetchingRates(false);
     }
   };
 
   // =========================================================
-  // 4) Create Shipment (Finalize)
+  // 4) Stripe Checkout
   // =========================================================
-  const handleCreateShipment = async () => {
+  const handleProceedToPayment = async () => {
+    // If user clicks without selecting any shipping option
     if (!selectedRate) {
-      toast.warn("Please select a shipping method first!");
+      toast.warn("Please select any one delivery option to proceed for payment!");
       return;
     }
-    // For demonstration, just show a toast
-    toast.success("Shipment created with selected rate!");
-  };
 
-  // =========================================================
-  // 5) Track Shipment
-  // =========================================================
-  const handleTrackShipment = async () => {
-    if (!selectedRate) {
-      toast.warn("Please select a shipping rate first!");
-      return;
-    }
     try {
-      setIsTracking(true);
+      setIsCreatingShipment(true);
 
-      const carrierMapping = {
-        UPS: "ups",
-        USPS: "usps",
-        FEDEX: "fedex",
-        DHL: "dhl",
-        DEFAULT: "shippo",
+      // 1) Build Stripe line items from your cart items
+      const lineItems = cartItems.map((item) => ({
+        price_data: {
+          currency: "usd",
+          product_data: {
+            name: item.title,
+            description: item.description,
+            images: item.images,
+          },
+          unit_amount: Math.round(parseFloat(item.price) * 100),
+        },
+        quantity: parseInt(item.quantity, 10),
+      }));
+
+      // 2) Put shipping cost & other details into metadata
+      const metadata = {
+        shipping_cost: selectedRate?.amount ?? "0",
+        shipping_provider: selectedRate?.provider ?? "",
+        shipping_service: selectedRate?.servicelevel?.display_name ?? "",
+        user_email: receiver.email ?? "",
       };
-      const providerKey = (selectedRate.provider || "").toUpperCase();
-      const carrier = carrierMapping[providerKey] || carrierMapping.DEFAULT;
-      // For demo, we use a fake tracking number
-      const trackingNumber = "SHIPPO_TRANSIT";
 
-      const response = await fetch(
-        `/api/track?carrier=${carrier}&tracking=${trackingNumber}`
-      );
-      const data = await response.json();
+      // 3) Create a checkout session on your backend
+      const checkoutObj = {
+        line_items: lineItems,
+        metadata,
+        email: receiver.email, // if you want to prefill the email in Stripe
+      };
 
-      if (data.error) {
-        setTrackingError(data.error);
-        setTrackingInfo(null);
-        toast.error(`Tracking error: ${data.error}`);
-      } else {
-        setTrackingInfo(data);
-        setTrackingError("");
-        toast.success("Tracking info loaded!");
+      const checkoutResponse = await fetch("/api/stripe/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(checkoutObj),
+      });
+
+      if (!checkoutResponse.ok) {
+        throw new Error("Failed to initiate Stripe checkout.");
       }
+
+      const { session } = await checkoutResponse.json();
+
+      // 4) Redirect to Stripe
+      router.push(session.url);
     } catch (error) {
-      console.error("Error tracking shipment:", error);
-      setTrackingError("An error occurred while tracking shipment.");
-      setTrackingInfo(null);
-      toast.error("An error occurred while tracking shipment.");
+      toast.error("Error redirecting to payment: " + error.message);
+      console.error(error);
     } finally {
-      setIsTracking(false);
+      setIsCreatingShipment(false);
     }
   };
 
@@ -224,23 +224,9 @@ export default function BorderfreeStyleCheckout() {
     setReceiver((prev) => ({ ...prev, [name]: value }));
   };
 
-  // We'll call the Shippo address validation endpoint.
-  // This endpoint returns "recommended_address" in the shape:
-  // {
-  //   "recommended_address": {
-  //     "address_line_1": "...",
-  //     "address_line_2": "...",
-  //     "city_locality": "...",
-  //     "state_province": "...",
-  //     "postal_code": "...",
-  //     ...
-  //   }
-  // }
   const handleAddressChangeAndSuggest = async (e) => {
     handleInputChange(e);
-
     const updatedValue = e.target.value;
-    // Only attempt to validate if user typed at least 5 chars
     if (updatedValue.length < 5) {
       setAddressSuggestions([]);
       setShowSuggestions(false);
@@ -248,7 +234,6 @@ export default function BorderfreeStyleCheckout() {
     }
 
     try {
-      // Build the GET URL for address validation
       const url = new URL("https://api.goshippo.com/v2/addresses/validate");
       url.searchParams.set("name", `${receiver.firstName} ${receiver.lastName}`);
       url.searchParams.set("organization", "Shippo");
@@ -272,11 +257,7 @@ export default function BorderfreeStyleCheckout() {
       }
 
       const data = await response.json();
-
-      // If Shippo provides a recommended address, place it in our suggestions
-      // For example, data.recommended_address
       if (data.recommended_address) {
-        // We'll store it as a single-element array
         setAddressSuggestions([data.recommended_address]);
         setShowSuggestions(true);
       } else {
@@ -290,7 +271,6 @@ export default function BorderfreeStyleCheckout() {
     }
   };
 
-  // If the user selects the recommended address, fill out our fields
   const handleSelectSuggestedAddress = (suggestion) => {
     setReceiver((prev) => ({
       ...prev,
@@ -301,12 +281,11 @@ export default function BorderfreeStyleCheckout() {
       postalCode: suggestion.postal_code || prev.postalCode,
       location: suggestion.country_code || prev.location,
     }));
-
     setShowSuggestions(false);
   };
 
   // =========================================================
-  // 7) Compute item subtotal, etc.
+  // 7) Compute item subtotal, shipping, tax, etc.
   // =========================================================
   const itemSubtotal = cartItems.reduce((sum, item) => {
     const itemPrice = parseFloat(item.price) || 0;
@@ -316,7 +295,6 @@ export default function BorderfreeStyleCheckout() {
   const shippingCost = selectedRate ? parseFloat(selectedRate.amount) : 0;
   const grandTotal = itemSubtotal + shippingCost;
 
-  // Identify cheapest/fastest for tagging
   let minCost = Infinity;
   let minDays = Infinity;
   if (shipment?.rates?.length) {
@@ -328,6 +306,9 @@ export default function BorderfreeStyleCheckout() {
     });
   }
 
+  // =========================================================
+  // Render
+  // =========================================================
   return (
     <>
       <ToastContainer
@@ -341,7 +322,7 @@ export default function BorderfreeStyleCheckout() {
       />
 
       <div className="max-w-7xl mx-auto mt-36 px-4 md:px-0">
-        <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">     
+        <h1 className="text-xl md:text-2xl font-bold text-gray-800 mb-6">
           Secure Checkout
         </h1>
 
@@ -356,7 +337,6 @@ export default function BorderfreeStyleCheckout() {
                 1) Delivery
               </h2>
 
-              {/* Email, first & last name */}
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -398,7 +378,6 @@ export default function BorderfreeStyleCheckout() {
                 </div>
               </div>
 
-              {/* Address line 1 & 2 (with recommended-address dropdown) */}
               <div
                 className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4"
                 ref={suggestionsRef}
@@ -415,8 +394,7 @@ export default function BorderfreeStyleCheckout() {
                     className="border rounded w-full px-3 py-2"
                     autoComplete="off"
                   />
-
-                  {/* Suggestions dropdown (1 recommended address) */}
+                  {/* If fetching suggestions, show them */}
                   {showSuggestions && addressSuggestions.length > 0 && (
                     <ul className="absolute z-10 bg-white border border-gray-200 w-full mt-1">
                       {addressSuggestions.map((suggest, idx) => (
@@ -425,7 +403,6 @@ export default function BorderfreeStyleCheckout() {
                           className="p-2 cursor-pointer hover:bg-gray-100 text-sm"
                           onClick={() => handleSelectSuggestedAddress(suggest)}
                         >
-                          {/* Show complete_address if available, otherwise combine fields */}
                           {suggest.complete_address
                             ? suggest.complete_address
                             : `${suggest.address_line_1}, ${suggest.city_locality}, ${suggest.state_province} ${suggest.postal_code}`}
@@ -448,7 +425,6 @@ export default function BorderfreeStyleCheckout() {
                 </div>
               </div>
 
-              {/* Postal code, city, region, phone, country */}
               <div className="grid md:grid-cols-3 gap-4 mb-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -520,11 +496,38 @@ export default function BorderfreeStyleCheckout() {
               <h2 className="text-lg font-semibold text-gray-700 mb-4">
                 2) Delivery Method
               </h2>
-              {!shipment && (
+
+              {/* If we're currently fetching shipping rates, show a "loading" card */}
+              {isFetchingRates && !shipment && (
+                <div className="flex items-center justify-center bg-gray-50 border border-gray-200 p-4 rounded-md mb-4">
+                  <svg
+                    className="animate-spin h-5 w-5 mr-3 text-blue-600"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8V0C5.383 0 0 5.383 0 12h4z"
+                    ></path>
+                  </svg>
+                  <span className="text-gray-700">Fetching shipping rates. Please wait...</span>
+                </div>
+              )}
+
+              {!shipment && !isFetchingRates && (
                 <p className="text-sm text-gray-500 mb-2">
                   Enter a valid address to see available delivery methods.
                 </p>
               )}
+
               {shipment && shipment.rates && shipment.rates.length > 0 && (
                 <div className="overflow-x-auto">
                   <table className="w-full border-collapse">
@@ -593,10 +596,10 @@ export default function BorderfreeStyleCheckout() {
               )}
             </div>
 
-            {/* Buttons (Create / Track) */}
+            {/* Buttons */}
             <div className="pt-4 flex flex-col md:flex-row gap-3">
               <button
-                onClick={handleCreateShipment}
+                onClick={handleProceedToPayment}
                 disabled={!selectedRate || isCreatingShipment}
                 className={`bg-blue-600 hover:bg-blue-700 text-white font-medium px-5 py-2 rounded-md flex items-center justify-center ${
                   (!selectedRate || isCreatingShipment)
@@ -607,27 +610,11 @@ export default function BorderfreeStyleCheckout() {
                 {isCreatingShipment && (
                   <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
                 )}
-                {isCreatingShipment
-                  ? "Please wait..."
-                  : "Proceed to Pay"}
+                {isCreatingShipment ? "Please wait..." : "Proceed to Pay"}
               </button>
-
-              {/* {shipment && shipment.rates && shipment.rates.length > 0 && (
-                <button
-                  onClick={handleTrackShipment}
-                  disabled={isTracking}
-                  className={`bg-green-600 hover:bg-green-700 text-white font-medium px-5 py-2 rounded-md flex items-center justify-center ${
-                    isTracking ? "opacity-80 cursor-not-allowed" : ""
-                  }`}
-                >
-                  {isTracking && (
-                    <span className="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full mr-2"></span>
-                  )}
-                  {isTracking ? "Tracking..." : "Track Shipment"}
-                </button>
-              )} */}
             </div>
           </div>
+
           {/* =========================================== */}
           {/* RIGHT: Order Summary */}
           {/* =========================================== */}
@@ -673,8 +660,7 @@ export default function BorderfreeStyleCheckout() {
                       {/* Price */}
                       <div>
                         <p className="font-semibold text-gray-700">
-                          $
-                          {(parseFloat(item.price) * item.quantity).toFixed(2)}
+                          ${(parseFloat(item.price) * item.quantity).toFixed(2)}
                         </p>
                       </div>
                     </div>
@@ -683,21 +669,37 @@ export default function BorderfreeStyleCheckout() {
               )}
             </div>
 
-            {/* Totals */}
+            {/* Totals (Items, Shipping, Tax placeholder, Grand Total) */}
             <div className="bg-white border rounded-lg shadow-md p-6">
+              {/* Items */}
               <div className="flex justify-between mb-2">
                 <p className="text-gray-700">Items</p>
                 <p className="font-medium text-gray-700">
                   ${itemSubtotal.toFixed(2)}
                 </p>
               </div>
+
+              {/* Shipping */}
               <div className="flex justify-between mb-2">
                 <p className="text-gray-700">Shipping</p>
                 <p className="font-medium text-gray-700">
-                  {selectedRate ? `$${shippingCost.toFixed(2)}` : "—"}
+                  {selectedRate
+                    ? `$${shippingCost.toFixed(2)}`
+                    : "—"}
                 </p>
               </div>
+
+              {/* Taxes */}
+              <div className="flex justify-between mb-2">
+                <p className="text-gray-700">Taxes</p>
+                <p className="font-medium text-gray-700 text-sm italic">
+                  Yet to be calculated while payment
+                </p>
+              </div>
+
               <hr className="my-2" />
+
+              {/* Grand Total */}
               <div className="flex justify-between mb-4">
                 <p className="text-lg font-semibold text-gray-800">Total</p>
                 <p className="text-lg font-semibold text-gray-800">
@@ -706,112 +708,6 @@ export default function BorderfreeStyleCheckout() {
               </div>
             </div>
           </div>
-        </div>
-
-        {/* =========================================== */}
-        {/* Tracking Info (If any) */}
-        {/* =========================================== */}
-        <div className="mt-6">
-          {trackingError && (
-            <div className="bg-red-100 border border-red-300 text-red-700 px-4 py-3 rounded mb-4">
-              {trackingError}
-            </div>
-          )}
-          {trackingInfo && (
-            <div className="bg-white rounded-xl shadow-md p-6">
-              <h2 className="text-xl font-bold mb-2 text-gray-800">
-                Tracking Info
-              </h2>
-              <div className="mb-4">
-                <p className="text-gray-700 mb-1">
-                  <strong>Tracking Number:</strong>{" "}
-                  {trackingInfo.tracking_number}
-                </p>
-                <p className="text-gray-700 mb-1">
-                  <strong>Carrier:</strong> {trackingInfo.carrier}
-                </p>
-                <p className="text-gray-700 mb-1">
-                  <strong>Service Level:</strong>{" "}
-                  {trackingInfo.servicelevel?.name || "N/A"}
-                </p>
-                <p className="text-gray-700 mb-1">
-                  <strong>ETA:</strong>{" "}
-                  {trackingInfo.eta
-                    ? new Date(trackingInfo.eta).toLocaleString()
-                    : "N/A"}
-                </p>
-                <p className="text-gray-700 mb-3">
-                  <strong>Status:</strong>{" "}
-                  {trackingInfo.tracking_status?.status || "Unknown"}
-                </p>
-
-                {trackingInfo.tracking_status?.status_details && (
-                  <div className="bg-gray-50 border-l-4 border-blue-400 p-3 mb-3">
-                    <p className="text-sm text-gray-700">
-                      {trackingInfo.tracking_status?.status_details}
-                    </p>
-                  </div>
-                )}
-              </div>
-
-              {/* Address From / To */}
-              <div className="grid gap-4 md:grid-cols-2 mb-4">
-                <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">
-                    Address From
-                  </h3>
-                  <p className="text-gray-700 text-sm">
-                    {trackingInfo.address_from?.city},{" "}
-                    {trackingInfo.address_from?.state}{" "}
-                    {trackingInfo.address_from?.zip},{" "}
-                    {trackingInfo.address_from?.country}
-                  </p>
-                </div>
-                <div>
-                  <h3 className="font-semibold text-gray-700 mb-2">
-                    Address To
-                  </h3>
-                  <p className="text-gray-700 text-sm">
-                    {trackingInfo.address_to?.city},{" "}
-                    {trackingInfo.address_to?.state}{" "}
-                    {trackingInfo.address_to?.zip},{" "}
-                    {trackingInfo.address_to?.country}
-                  </p>
-                </div>
-              </div>
-
-              {/* Tracking History */}
-              <h3 className="font-semibold text-gray-700 mb-2">
-                Tracking History
-              </h3>
-              {trackingInfo.tracking_history &&
-              trackingInfo.tracking_history.length > 0 ? (
-                <ul className="border-l-2 border-gray-300 pl-4">
-                  {trackingInfo.tracking_history.map((event) => (
-                    <li key={event.object_id} className="mb-6 relative">
-                      <div className="absolute -left-3 top-0 w-5 h-5 bg-blue-400 rounded-full"></div>
-                      <div className="text-sm text-gray-700">
-                        <span className="font-medium">
-                          {new Date(event.status_date).toLocaleString()}
-                        </span>{" "}
-                        - {event.status_details}
-                      </div>
-                      {event.location && (
-                        <p className="text-sm text-gray-500 ml-2">
-                          {event.location.city}, {event.location.state}{" "}
-                          {event.location.zip}, {event.location.country}
-                        </p>
-                      )}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p className="text-gray-500 text-sm">
-                  No tracking history available.
-                </p>
-              )}
-            </div>
-          )}
         </div>
       </div>
     </>
