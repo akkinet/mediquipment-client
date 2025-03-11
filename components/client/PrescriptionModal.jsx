@@ -281,6 +281,7 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
       line_items: lineItems,
       metadata,
     };
+
     if (email) {
       checkoutObj.email = email;
     }
@@ -291,16 +292,20 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
     const totalCartValue = cart.reduce((acc, item) => {
       return acc + item.price * item.quantity;
     }, 0);
-
     if (totalCartValue < 500) {
       // Take user to your shipping page
+       localStorage.setItem("checkoutObj" , JSON.stringify(checkoutObj) );
+
       router.push("/package-shipment");
     } else {
       // Go directly to Stripe
+     
+
       const checkoutResponse = await fetch("/api/stripe/checkout", {
         method: "POST",
         body: JSON.stringify(checkoutObj),
       });
+      
       const { session } = await checkoutResponse.json();
       router.push(session.url);
     }

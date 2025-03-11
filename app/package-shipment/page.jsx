@@ -180,24 +180,27 @@ export default function BorderfreeStyleCheckout() {
       }));
 
       // 2) Put shipping cost & other details into metadata
-      const metadata = {
-        shipping_cost: selectedRate?.amount ?? "0",
-        shipping_provider: selectedRate?.provider ?? "",
-        shipping_service: selectedRate?.servicelevel?.display_name ?? "",
-        user_email: receiver.email ?? "",
-      };
+      // const metadata = {
+      //   selected_rate: selectedRate,
+      //   // shipping_provider: selectedRate?.provider ?? "",
+      //   // shipping_service: selectedRate?.servicelevel?.display_name ?? "",
+      //   user_email: receiver.email ?? "",
+      // };
 
       // 3) Create a checkout session on your backend
-      const checkoutObj = {
-        line_items: lineItems,
-        metadata,
-        email: receiver.email, // if you want to prefill the email in Stripe
-      };
+       const checkoutObj = JSON.parse(localStorage.getItem("checkoutObj"));
+
+      // const checkoutObj = {
+      //   line_items: lineItems,
+      //   metadata,
+      //   email: receiver.email, // if you want to prefill the email in Stripe
+      // };
+
 
       const checkoutResponse = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(checkoutObj),
+        body: JSON.stringify({...checkoutObj , selectedRate} ),
       });
 
       if (!checkoutResponse.ok) {
