@@ -5,9 +5,6 @@ export const POST = async (req) => {
   try {
     const { line_items, email, metadata, selectedRate } = await req.json();
 
-    // Convert the shipping rate amount to cents (Stripe requires amounts in cents)
-    const shippingAmount = Math.round(parseFloat(selectedRate.amount) * 100);
-
     // Create the session object
     const sessionObj = {
       currency: "usd",
@@ -27,7 +24,12 @@ export const POST = async (req) => {
         allowed_countries: ["US"],
       },
       line_items,
-      shipping_options: [
+    };
+
+    if (selectedRate) {
+      // Convert the shipping rate amount to cents (Stripe requires amounts in cents)
+      const shippingAmount = Math.round(parseFloat(selectedRate.amount) * 100);
+      sessionObj.shipping_options = [
         {
           shipping_rate_data: {
             type: "fixed_amount",
@@ -48,8 +50,8 @@ export const POST = async (req) => {
             },
           },
         },
-      ],
-    };
+      ];
+    }
 
     // Add metadata if provided
     if (metadata) {
