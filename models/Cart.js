@@ -16,6 +16,6 @@ const cartSchema = new Schema({
     items: [itemSchema] // Embedded subdocument array of items
 });
 
-const Cart = mongoose.model('Cart', cartSchema, "Cart");
+const Cart = mongoose.model.Cart || mongoose.model('Cart', cartSchema, "Cart");
 
 export default Cart;
