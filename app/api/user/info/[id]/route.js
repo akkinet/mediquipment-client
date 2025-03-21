@@ -13,6 +13,7 @@ export const GET = async (req, ctx) => {
         createdAt: 0,
         updatedAt: 0,
         verified: 0,
+        password: 0
       }
     );
 
