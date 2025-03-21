@@ -11,7 +11,7 @@ export const POST = async (req) => {
     // user = await user.json();
     let user = await Users.findOne({
       $or: [{ username: username }, { email: username }],
-    });
+    }).lean();
 
     if (user && user.message)
       return NextResponse.json(
