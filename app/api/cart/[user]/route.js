@@ -30,7 +30,7 @@ export const GET = async (req, ctx) => {
     // Fetch the cart for the specified user
     const cart = await Cart.findOne(
       { email: ctx.params.user },
-      { projection: { items: 1, _id: 0 } }
+      { projection: { items: 1 } }
     );
 
     // Return the cart items or an empty array if no cart is found

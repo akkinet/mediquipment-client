@@ -1,13 +1,17 @@
 import { NextResponse } from "next/server";
 import bcrypt from "bcrypt";
+import Users from "../../../../models/Users";
 
 export const POST = async (req) => {
   try {
     const { username, password } = await req.json();
-    let user = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/user/info/${username}`
-    );
-    user = await user.json();
+    // let user = await fetch(
+    //   `${process.env.NEXT_PUBLIC_API_URL}/user/info/${username}`
+    // );
+    // user = await user.json();
+    let user = await Users.findOne({
+      $or: [{ username: username }, { email: username }],
+    });
 
     if (user && user.message)
       return NextResponse.json(
@@ -30,7 +34,7 @@ export const POST = async (req) => {
         .filter((u) => chosenField.includes(u[0]))
         .map((f) => [f[0], f[1]])
     );
-      
+
     return NextResponse.json(user, { status: 200 });
   } catch (err) {
     return NextResponse.json({ error: err.message }, { status: 500 });
