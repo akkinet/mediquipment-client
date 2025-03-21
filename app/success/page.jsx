@@ -40,7 +40,7 @@ function page() {
 
   useEffect(() => {
     const callApi = async () => {
-      if (session) {
+      if (session && session.user) {
         await fetch(`/api/cart/${session.user.email}`, {
           method: "DELETE",
         });
