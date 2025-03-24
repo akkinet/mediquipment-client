@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import sendMail from "../../../lib/sendMail";
 import Order from "../../../models/Order";
 import Stripe from "stripe";
+import { transaction } from "../../../lib/shippo";
 const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const POST = async (req) => {
@@ -22,7 +23,7 @@ export const POST = async (req) => {
     const user = await user_info.json();
 
     const paymentIntent = await stripe.paymentIntents.retrieve(checkout_session.payment_intent);
-
+    
     if (user.message == "Not Found") {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/create`, {
         method: "POST",
@@ -32,7 +33,11 @@ export const POST = async (req) => {
     const productItems = checkout_session.line_items.data;
     const date = new Date();
 
+    const trans = await transaction(checkout_session.metadata.shipping_rate);
+
     const orderParams = {
+      carrier: trans.carrier,
+      tracking_number: trans.tracking_number,
       total_amount: checkout_session.amount_total,
       order_status: JSON.parse(checkout_session.metadata.prescription_required)
         ? "Pending"
