@@ -61,11 +61,13 @@ export const POST = async (req) => {
     const parsedProdList = JSON.parse(checkout_session.metadata.products);
     for (const item of productItems) {
       const prodResp = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/product/${parsedProdList[item.description]}`,
+        `${process.env.NEXT_PUBLIC_API_URL}/product/${
+          parsedProdList[item.description]
+        }`,
         {
           method: "PUT",
           body: JSON.stringify({
-            quantity: Number(item.quantity)
+            quantity: Number(item.quantity),
           }),
         }
       );
@@ -79,13 +81,15 @@ export const POST = async (req) => {
         image: product.product.prod_images[0],
         quantity: item.quantity,
         price: (item.amount_total / 100).toFixed(2),
-        prescription_required: product.product.prod_id in presItems || presItems[product.product.prod_id] == "",
+        prescription_required:
+          product.product.prod_id in presItems ||
+          presItems[product.product.prod_id] == "",
         prescription_file: presItems[product.product.prod_id] ?? "",
       });
     }
 
     const orderCrt = await Order.create(orderParams);
-    
+
     const ship = orderParams.shipping_address;
     const bill = orderParams.billing_address;
 
@@ -134,7 +138,9 @@ export const POST = async (req) => {
       <li>Shipping: 0</li>
       <li><strong>Total: ${orderParams.total_amount}</strong></li>
     </ul>
-    <p>you can view your order history by clicking on this <a href=${process.env.NEXTAUTH_URL}/order-history>link<a/></p>
+    <p>you can view your order history by clicking on this <a href=${
+      process.env.NEXTAUTH_URL
+    }/order-history>link<a/></p>
 
     <p class="mb-4">
       Thank you for your order! If you have any questions, please don't

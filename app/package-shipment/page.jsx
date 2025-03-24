@@ -218,7 +218,6 @@ export default function BorderfreeStyleCheckout() {
       setIsCreatingShipment(false);
     }
   };
-
   // =========================================================
   // 6) Address Handlers (with recommended_address)
   // =========================================================
@@ -308,10 +307,6 @@ export default function BorderfreeStyleCheckout() {
       if (days < minDays) minDays = days;
     });
   }
-
-  // =========================================================
-  // Render
-  // =========================================================
   return (
     <>
       <ToastContainer
