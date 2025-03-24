@@ -34,9 +34,10 @@ export const POST = async (req) => {
     const date = new Date();
 
     const trans = await transaction(checkout_session.metadata.shipping_rate);
-
+  console.log("carrier and trans" , trans.carrier , trans);
     const orderParams = {
-      carrier: trans.carrier,
+      carrier: trans.carrier || "SHIPPO",
+      
       tracking_number: trans.tracking_number,
       total_amount: checkout_session.amount_total,
       order_status: JSON.parse(checkout_session.metadata.prescription_required)

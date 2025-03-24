@@ -7,7 +7,7 @@ export default function CancelPage() {
 
     useEffect(() => {
         // Optional: You can add logic to log cancellation data or trigger any necessary actions.
-        console.log("Payment cancelled.");
+        // console.log("Payment cancelled.");
 
         // Redirect back to the home page after a short delay
         const timeout = setTimeout(() => {

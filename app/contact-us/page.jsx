@@ -38,7 +38,7 @@ export default function Contact() {
   const handleSubmit = (e) => {
     e.preventDefault();
     // Handle form submission
-    console.log(form);
+    // console.log(form);
   };
 
   return (

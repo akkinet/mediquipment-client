@@ -12,7 +12,7 @@ function SessionProVider({ children, session }) {
 
   useEffect(() => {
     socket.on("connect", () => {
-      console.log("Connected to server");
+      // console.log("Connected to server");
     });
     // return () => socket.disconnect();
   }, []);

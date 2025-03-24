@@ -12,7 +12,7 @@ export const PUT = async (req, ctx) => {
     );
 
     if (result) {
-      console.log("Updated document:", result);
+      // console.log("Updated document:", result);
       return NextResponse.json({ message: "Cart updated successfully" });
     }
     return NextResponse.json(

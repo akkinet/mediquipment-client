@@ -23,12 +23,12 @@ export async function POST(req) {
       })
 
       // Retrieve and process payment information from the session object
-      console.log(session.payment_intent); // Contains payment details
-      console.log(session.id); // Contains payment details
-      console.log(session.customer_details); // Contains customer information
-      console.log(session.amount_total); // Total amount paid
-      console.log(session.currency); // Currency used
-      console.log(session.shipping); // Shipping information (if collected)
+      // console.log(session.payment_intent); // Contains payment details
+      // console.log(session.id); // Contains payment details
+      // console.log(session.customer_details); // Contains customer information
+      // console.log(session.amount_total); // Total amount paid
+      // console.log(session.currency); // Currency used
+      // console.log(session.shipping); // Shipping information (if collected)
     }
 
     if(event.type === 'checkout.session.expired'){

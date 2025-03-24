@@ -24,7 +24,7 @@ export const GET = async (req) => {
 
     if (price) {
       const parsedPrice = JSON.parse(price);
-      console.log("parsedPrice", parsedPrice, typeof(Object.values(parsedPrice)[0]));
+      // console.log("parsedPrice", parsedPrice, typeof(Object.values(parsedPrice)[0]));
  
       filter.prod_value = parsedPrice; // Assuming price is a single number
     }

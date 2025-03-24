@@ -31,7 +31,7 @@ export const POST = async (req) => {
     );
 
     if (result) {
-      console.log("Updated document:", result);
+      // console.log("Updated document:", result);
       return NextResponse.json({
         message: "Item added to cart successfully",
         updatedCart: result.items,
