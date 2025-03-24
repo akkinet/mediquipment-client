@@ -3,7 +3,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 export const POST = async (req) => {
   try {
-    const { line_items, email, metadata, selectedRate } = await req.json();
+    const { line_items, email, metadata, selectedRate, total_amount, name, address } = await req.json();
 
     // Create the session object
     const sessionObj = {
@@ -16,15 +16,22 @@ export const POST = async (req) => {
       phone_number_collection: {
         enabled: true,
       },
-      automatic_tax: {
-        enabled: true,
-      },
+      // automatic_tax: {
+      //   enabled: true,
+      // },
       payment_method_types: ["card", "us_bank_account", "amazon_pay"],
-      shipping_address_collection: {
-        allowed_countries: ["US"],
+      // shipping_address_collection: {
+      //   allowed_countries: ["US"],
+      // },
+      payment_intent_data: {
+        shipping: {
+          name,
+          address,
+        },
       },
       line_items,
     };
+
 
     if (selectedRate) {
       // Convert the shipping rate amount to cents (Stripe requires amounts in cents)
@@ -34,7 +41,7 @@ export const POST = async (req) => {
           shipping_rate_data: {
             type: "fixed_amount",
             fixed_amount: {
-              amount: shippingAmount, // Shipping cost in cents
+              amount: total_amount < 500 ? shippingAmount : 0, 
               currency: "usd",
             },
             display_name: selectedRate.servicelevel.display_name, // Shipping method name (e.g., "UPS® Ground")
