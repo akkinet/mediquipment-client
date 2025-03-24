@@ -56,7 +56,10 @@ const OrderSchema = new mongoose.Schema({
   shipping_amount: { type: Number, default: 0.00 },
   sub_amount: { type: Number, required: true },
   tax_amount: { type: Number, default: 0.00 },
-  total_amount: { type: Number, required: true }
+  total_amount: { type: Number, required: true },
+  tracking_number: { type: String, default: "" },
+  carrier: { type: String, default: "" },
+  checkout_session: {type: String}
 }, { timestamps: true });
 
 // Check if the model has already been defined
