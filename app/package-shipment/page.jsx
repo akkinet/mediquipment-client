@@ -103,14 +103,14 @@ export default function BorderfreeStyleCheckout() {
 
       const shipmentData = {
         address_from: {
-          name: "Sender",
-          street1: "123 Main St",
-          city: "New York",
-          state: "NY",
-          zip: "10001",
+          name: "Jkare",
+          street1: "4101 SW 73rd Ave",
+          city: "Miami",
+          state: "FL",
+          zip: "33155-4520",
           country: "US",
-          email: "sender@example.com",
-          phone: "+15551234567",
+          email: "akash@hexerve.com",
+          phone: "+13052481003",
         },
         address_to: {
           name: receiver.firstName + " " + receiver.lastName,
@@ -165,39 +165,27 @@ export default function BorderfreeStyleCheckout() {
     try {
       setIsCreatingShipment(true);
 
-      // 1) Build Stripe line items from your cart items
-      const lineItems = cartItems.map((item) => ({
-        price_data: {
-          currency: "usd",
-          product_data: {
-            name: item.title,
-            description: item.description,
-            images: item.images,
-          },
-          unit_amount: Math.round(parseFloat(item.price) * 100),
-        },
-        quantity: parseInt(item.quantity, 10),
-      }));
+      let checkoutObj = JSON.parse(localStorage.getItem("checkoutStorage"));
 
-      // 2) Put shipping cost & other details into metadata
-      const metadata = {
-        shipping_cost: selectedRate?.amount ?? "0",
-        shipping_provider: selectedRate?.provider ?? "",
-        shipping_service: selectedRate?.servicelevel?.display_name ?? "",
-        user_email: receiver.email ?? "",
-      };
+      if(!checkoutObj.email)
+        checkoutObj.email = receiver.email;
 
-      // 3) Create a checkout session on your backend
-      const checkoutObj = {
-        line_items: lineItems,
-        metadata,
-        email: receiver.email, // if you want to prefill the email in Stripe
-      };
-
+      checkoutObj.selectedRate = selectedRate;
       const checkoutResponse = await fetch("/api/stripe/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(checkoutObj),
+        body: JSON.stringify({...checkoutObj,
+          metadata: {...checkoutObj.metadata, shipping_rate: selectedRate.object_id},
+          name: receiver.firstName.trim() + " " + receiver.lastName.trim(),
+          address: {
+            line1: receiver.address,
+            line2: receiver.address2,
+            city: receiver.city,
+            state: receiver.region,
+            postal_code: receiver.postalCode,
+            country: receiver.location,
+          },
+        }),
       });
 
       if (!checkoutResponse.ok) {
@@ -206,7 +194,6 @@ export default function BorderfreeStyleCheckout() {
 
       const { session } = await checkoutResponse.json();
 
-      // 4) Redirect to Stripe
       router.push(session.url);
     } catch (error) {
       toast.error("Error redirecting to payment: " + error.message);

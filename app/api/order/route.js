@@ -1,19 +1,27 @@
 import { NextResponse } from "next/server";
 import sendMail from "../../../lib/sendMail";
 import Order from "../../../models/Order";
+import Stripe from "stripe";
+const stripe = Stripe(process.env.STRIPE_SECRET_KEY);
 
 export const POST = async (req) => {
   try {
     const body = await req.json();
-    let checkout_session = await fetch(
-      `${process.env.NEXT_PUBLIC_API_URL}/stripe/checkout/${body.sessionID}`
-    );
-    checkout_session = await checkout_session.json();
+    // let checkout_session = await fetch(
+    //   `${process.env.NEXT_PUBLIC_API_URL}/stripe/checkout/${body.sessionID}`
+    // );
+    // checkout_session = await checkout_session.json();
+
+    const checkout_session = await stripe.checkout.sessions.retrieve(body.sessionID, {
+      expand: ['line_items'],
+    });
     const customer = checkout_session.customer_details;
     let user_info = await fetch(
       `${process.env.NEXT_PUBLIC_API_URL}/user/info/${customer.email}`
     );
     const user = await user_info.json();
+
+    const paymentIntent = await stripe.paymentIntents.retrieve(checkout_session.payment_intent);
 
     if (user.message == "Not Found") {
       await fetch(`${process.env.NEXT_PUBLIC_API_URL}/user/create`, {
@@ -34,7 +42,8 @@ export const POST = async (req) => {
       customer_name: customer.name,
       customer_phone: customer.phone,
       order_date: date.toLocaleString(),
-      shipping_address: checkout_session.shipping_details.address,
+      // shipping_address: checkout_session.shipping_details.address,
+      shipping_address: paymentIntent.shipping.address,
       billing_address: customer.address,
       total_amount: (checkout_session.amount_total / 100).toFixed(2),
       sub_amount: (checkout_session.amount_subtotal / 100).toFixed(2),

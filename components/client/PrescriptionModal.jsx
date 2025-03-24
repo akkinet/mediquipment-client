@@ -292,18 +292,22 @@ function PrescriptionModal({ cart, isModalOpen, setIsModalOpen, email }) {
       return acc + item.price * item.quantity;
     }, 0);
 
-    if (totalCartValue < 500) {
+    checkoutObj.total_amount = totalCartValue;
+
+    // if (totalCartValue < 500) {
       // Take user to your shipping page
+      localStorage.setItem("checkoutStorage", JSON.stringify(checkoutObj))
       router.push("/package-shipment");
-    } else {
-      // Go directly to Stripe
-      const checkoutResponse = await fetch("/api/stripe/checkout", {
-        method: "POST",
-        body: JSON.stringify(checkoutObj),
-      });
-      const { session } = await checkoutResponse.json();
-      router.push(session.url);
-    }
+      setIsModalOpen(false)
+    // } else {
+    //   // Go directly to Stripe
+    //   const checkoutResponse = await fetch("/api/stripe/checkout", {
+    //     method: "POST",
+    //     body: JSON.stringify(checkoutObj),
+    //   });
+    //   const { session } = await checkoutResponse.json();
+    //   router.push(session.url);
+    // }
   };
   // --------------------------------------------------
   // Render
