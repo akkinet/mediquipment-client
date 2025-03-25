@@ -36,9 +36,8 @@ export const POST = async (req) => {
     const trans = await transaction(checkout_session.metadata.shipping_rate);
   console.log("carrier and trans" , trans.carrier , trans);
     const orderParams = {
-      carrier: trans.carrier || "SHIPPO",
-      
-      tracking_number: trans.tracking_number,
+      carrier: trans.carrier ? trans.carrier : "shippo",
+      tracking_number: trans.tracking_number ? trans.tracking_number : "SHIPPO_TRANSIT",
       total_amount: checkout_session.amount_total,
       order_status: JSON.parse(checkout_session.metadata.prescription_required)
         ? "Pending"
