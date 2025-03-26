@@ -3,7 +3,9 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 export const POST = async (req) => {
   try {
-    const { line_items, email, metadata, selectedRate, total_amount, name, address } = await req.json();
+    let { line_items, email, metadata, selectedRate, total_amount, name, address } = await req.json();
+
+    line_items = line_items.map(item => ({...item, tax_rates : ["txr_1R6upeCcxBtZCrgdsRtoPFQ8"]}));
 
     // Create the session object
     const sessionObj = {

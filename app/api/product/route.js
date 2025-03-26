@@ -16,7 +16,9 @@ export const GET = async (req) => {
     const category = searchParams.get("category");
     const query = searchParams.get("query");
     const num = searchParams.get("num");
-    let filter = {};
+    let filter = {
+      isFeatured: true,
+    };
 
     if (category) {
       filter.category = category;
