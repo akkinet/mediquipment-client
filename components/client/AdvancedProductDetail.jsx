@@ -58,7 +58,7 @@ const AdvancedProductDetail = ({ data }) => {
       typeof window !== "undefined" && window.localStorage.getItem("medCart");
     const newProduct = {
       quantity,
-      product_id: data.product.prod_id,
+      product_id: data.product._id,
       description: data.product.prod_desc,
       prescription: data.product.key_features.rx_required,
       images: data.product.prod_images,
@@ -86,14 +86,14 @@ const AdvancedProductDetail = ({ data }) => {
         return;
       }
  
-      const exist = localCart.find((c) => c.product_id == data.product.prod_id);
+      const exist = localCart.find((c) => c.product_id == data.product._id);
       if (exist) {
         cart = localCart.map((c) => {
-          if (c.product_id == data.product.prod_id) {
+          if (c.product_id == data.product._id) {
             if (session && session.user) {
               upToDateCart({
                 quantity,
-                product_id: data.product.prod_id,
+                product_id: data.product._id,
                 email: session.user.email,
               });
             }
@@ -116,7 +116,7 @@ const AdvancedProductDetail = ({ data }) => {
         if (session && session.user) {
           addToCart({
             quantity,
-            product_id: data.product.prod_id,
+            product_id: data.product._id,
             email: session.user.email,
             ...data.product,
           });
@@ -126,7 +126,7 @@ const AdvancedProductDetail = ({ data }) => {
       if (session && session.user) {
         addToCart({
           quantity,
-          product_id: data.product.prod_id,
+          product_id: data.product._id,
           email: session.user.email,
           ...data.product,
         });
@@ -207,7 +207,7 @@ const AdvancedProductDetail = ({ data }) => {
             >
               {isOutOfStock ? "Out of Stock" : "In Stock"}
             </span>
-            <p className="text-gray-600">PUI# : {data.product.prod_id}</p>
+            <p className="text-gray-600">PUI# : {data.product._id}</p>
           </div>
           <div className="border-y-2 border-gray-200 mt-2 py-2">
             <ul className="list-disc px-4 text-md">
@@ -364,8 +364,8 @@ const AdvancedProductDetail = ({ data }) => {
             <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mt-4">
               {data.relatedProducts.map((pd) => (
                 <Link
-                  href={`/product/${pd.prod_id}`}
-                  key={pd.prod_id}
+                  href={`/product/${pd._id}`}
+                  key={pd._id}
                   className="flex flex-col justify-between items-center p-4 border border-customBlue hover:border-2 hover:shadow-customBlue/40 shadow-md rounded w-full transition-transform duration-200 transform hover:scale-105"
                 >
                   <div>

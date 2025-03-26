@@ -390,8 +390,8 @@ const Navbar = () => {
                 <ul className="list-none p-0 hover:cursor-pointer ">
                   {searchResults.map((item) => (
                     <Link
-                      href={`/product/${item.prod_id}`}
-                      key={item.prod_id}
+                      href={`/product/${item._id}`}
+                      key={item._id}
                       className="flex items-center p-2 border-b hover:bg-customBlue/30"
                       onClick={handleMobileMenuItemClick}
                     >

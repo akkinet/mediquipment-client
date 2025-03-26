@@ -165,8 +165,8 @@ const Navbar = () => {
                     <ul className="list-none p-0">
                       {searchResults.map((item) => (
                         <Link
-                          href={`/product/${item.prod_id}`}
-                          key={item.prod_id}
+                          href={`/product/${item._id}`}
+                          key={item._id}
                           className="flex items-center p-2 border-b border-gray-200 hover:bg-blue-100 rounded-md transition"
                           onClick={() => setIsSearchDropdownVisible(false)}
                         >

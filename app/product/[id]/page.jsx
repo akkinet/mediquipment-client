@@ -23,7 +23,7 @@ async function ProductDetailPage({ params }) {
 // export async function generateStaticParams() {
 //   let data = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/product`);
 //   data = await data.json();
-//   return data.map((p) => ({ id: p.prod_id.toString() }));
+//   return data.map((p) => ({ id: p._id.toString() }));
 // }
 
 export default ProductDetailPage;

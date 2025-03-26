@@ -20,7 +20,7 @@ function getUniqueObjects(arr) {
 
 export const GET = async (req, ctx) => {
   try {
-    const result = await Product.findOne({prod_id: ctx.params.id})
+    const result = await Product.findOne({_id: ctx.params.id})
 
     const jsonRes = await fetch('https://s3.ap-south-1.amazonaws.com/medicom.hexerve/stopWords.json');
     const stopWords = await jsonRes.json();
@@ -35,7 +35,7 @@ export const GET = async (req, ctx) => {
         filterText = filterText[0].toUpperCase() + filterText.substr(1);
         
         const query = {
-          prod_id: { $ne: ctx.params.id }, // Exclude a specific prod_id
+          _id: { $ne: ctx.params.id }, // Exclude a specific _id
           prod_name: { $regex: new RegExp(filterText, "i") } // Case-insensitive search in product name
         };
         
@@ -69,7 +69,7 @@ export const PUT = async (req, ctx) => {
     }
 
     // Find the product and check stock availability
-    const product = await Product.findOne({ prod_id: productId });
+    const product = await Product.findOne({ _id: productId });
 
     if (!product) {
       return NextResponse.json(
@@ -87,7 +87,7 @@ export const PUT = async (req, ctx) => {
 
     // Update stock quantity by decrementing the given value
     const updatedProduct = await Product.findOneAndUpdate(
-      { prod_id: productId },
+      { _id: productId },
       { $inc: { stockQuantity: -quantity } }, // Reduce stock quantity
       { new: true } // Return updated product
     );

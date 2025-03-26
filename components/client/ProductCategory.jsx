@@ -142,9 +142,9 @@ const ProductCategory = ({ prod }) => {
               <div className="flex flex-wrap -m-4">
                 {products?.map((prod) => (
                   <Link
-                    href={`/product/${prod.prod_id}`}
+                    href={`/product/${prod._id}`}
                     className="p-4 lg:w-1/3 sm:w-1/2 transition-transform duration-200 transform hover:scale-105"
-                    key={prod.prod_id}
+                    key={prod._id}
                   >
                     <div className="bg-white h-full border shadow-xl hover:shadow-customPink/20 hover:border-customPink rounded-lg overflow-hidden">
                       <img

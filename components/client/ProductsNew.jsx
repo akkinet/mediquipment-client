@@ -214,8 +214,8 @@ const Products = ({ productList, brands }) => {
       <div className='w-full'>
       <div className="rightcontainer lg:h-fit lg:w-full lg:p-9 lg:pt-0 grid gap-4 p-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3">
         {currentProducts?.length ? currentProducts.map((prod) => (
-          <div className="p-2 flex flex-col" key={prod.prod_id}>
-            <Link href={`/product/${prod.prod_id}`}>
+          <div className="p-2 flex flex-col" key={prod._id}>
+            <Link href={`/product/${prod._id}`}>
               <div className="border shadow-xl shadow-customBlue/20 border-customBlue hover:shadow-customBlue/40 hover:border-2 rounded-lg overflow-hidden  
               flex flex-col items-center justify-between cursor-pointer transition-transform transform hover:scale-105">
                 <img

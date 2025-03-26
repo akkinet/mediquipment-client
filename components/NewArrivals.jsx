@@ -32,8 +32,8 @@ const NewArrivals = async () => {
               
               <div className="flex flex-wrap -m-4">
                 {data?.map((d) => (
-                  <div key={d.prod_id} className="p-4 md:w-1/3 ">
-                    <Link href={`product/${d.prod_id}`}>
+                  <div key={d._id} className="p-4 md:w-1/3 ">
+                    <Link href={`product/${d._id}`}>
                       <div className="bg-white border shadow-xl items-center hover:shadow-customPink/20 hover:border-customPink rounded-lg overflow-hidden transition-transform duration-200 transform hover:scale-105">
                         <img
                           className="lg:h-48 md:h-36 lg:w-full  object-contain object-center p-4 border-b border-black" 
