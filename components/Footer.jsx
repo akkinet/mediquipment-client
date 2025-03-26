@@ -4,7 +4,7 @@ import { FaInstagram, FaFacebook, FaTwitter } from 'react-icons/fa';
 const Footer = () => {
   return (
     <footer
-      className="relative text-white body-font"
+      className="relative text-white body-font bottom-0 w-full"
       style={{
         backgroundImage:
           'url(https://s3.ap-south-1.amazonaws.com/medicom.hexerve/footer+base+image+1.png)',

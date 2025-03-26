@@ -17,7 +17,7 @@ const Category = ({ category }) => {
     </div>
   )
   return (
-    <div className='text-black mt-32 lg:flex lg:justify-center lg:mx-20 font-montserrat'>
+    <div className='text-black mt-32 lg:flex lg:justify-center lg:mx-20 font-montserrat mb-32'>
       {category.length == 0 ? (
         renderSkeletonProducts()
       ) : (

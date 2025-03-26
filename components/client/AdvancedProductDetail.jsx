@@ -8,7 +8,7 @@ import { CartContext } from "../SessionProVider";
 import Link from "next/link";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
- 
+
 const AdvancedProductDetail = ({ data }) => {
   const [selectedImage, setSelectedImage] = useState(0);
   const [quantity, setQuantity] = useState(1);
@@ -16,15 +16,15 @@ const AdvancedProductDetail = ({ data }) => {
   const [thumbnailIndex, setThumbnailIndex] = useState(0);
   const [, setCartItems] = useContext(CartContext);
   const { data: session } = useSession();
- 
+
   const handleImageClick = () => {
     setIsModalOpen(true);
   };
- 
+
   const handleThumbnailClick = (index) => {
     setSelectedImage(index);
   };
- 
+
   const handleQuantityChange = (action) => {
     if (action === "increase") {
       setQuantity(quantity + 1);
@@ -32,30 +32,28 @@ const AdvancedProductDetail = ({ data }) => {
       setQuantity(quantity - 1);
     }
   };
- 
+
   async function addToCart(product) {
     await fetch("/api/cart", {
       method: "POST",
       body: JSON.stringify(product),
     });
   }
- 
+
   async function upToDateCart(product) {
     await fetch(`/api/cart/${product.email}?product_id=${product.product_id}`, {
       method: "PUT",
       body: JSON.stringify(product),
     });
   }
- 
+
   const cartHandler = () => {
     if (data.product.stockQuantity === 0) {
       // Disable adding to cart if out of stock
       return;
     }
- 
     let cart = [];
-    const medCart =
-      typeof window !== "undefined" && window.localStorage.getItem("medCart");
+    const medCart = typeof window !== "undefined" && window.localStorage.getItem("medCart");
     const newProduct = {
       quantity,
       product_id: data.product._id,
@@ -67,10 +65,10 @@ const AdvancedProductDetail = ({ data }) => {
       stockQuantity: data.product.stockQuantity,
       parcel_info: data.product.parcel,
     };
- 
+
     if (medCart) {
       const localCart = JSON.parse(medCart);
- 
+
       if (localCart.length < 10) {
         toast("Item added successfully", {
           position: "top-center",
@@ -85,7 +83,7 @@ const AdvancedProductDetail = ({ data }) => {
         });
         return;
       }
- 
+
       const exist = localCart.find((c) => c.product_id == data.product._id);
       if (exist) {
         cart = localCart.map((c) => {
@@ -133,25 +131,27 @@ const AdvancedProductDetail = ({ data }) => {
       }
       cart.push(newProduct);
     }
- 
+
     setCartItems(cart.length);
     window.localStorage.setItem("medCart", JSON.stringify(cart));
   };
- 
+
   const handleLeftArrowClick = () => {
     if (thumbnailIndex > 0) {
       setThumbnailIndex(thumbnailIndex - 1);
     }
   };
- 
+
   const handleRightArrowClick = () => {
     if (thumbnailIndex < data?.product.prod_images.length - 4) {
       setThumbnailIndex(thumbnailIndex + 1);
     }
   };
- 
+
   const isOutOfStock = data.product.stockQuantity === 0;
- 
+
+
+
   return (
     <div className="container mx-auto p-6 lg:mt-24 font-montserrat">
       <div className="flex flex-col md:flex-row lg:mt-8 md: mt-16 space-y-6 md:space-y-0 md:space-x-6 ">
@@ -179,11 +179,10 @@ const AdvancedProductDetail = ({ data }) => {
                     key={index}
                     src={image}
                     alt={`Thumbnail ${index + 1}`}
-                    className={`w-20 h-20 rounded-lg cursor-pointer object-contain ${
-                      selectedImage === thumbnailIndex + index
+                    className={`w-20 h-20 rounded-lg cursor-pointer object-contain ${selectedImage === thumbnailIndex + index
                         ? "border-2 border-customBlue"
                         : ""
-                    }`}
+                      }`}
                     onClick={() => handleThumbnailClick(thumbnailIndex + index)}
                   />
                 ))}
@@ -201,9 +200,8 @@ const AdvancedProductDetail = ({ data }) => {
           <h2 className="text-2xl font-bold">{data.product.prod_name}</h2>
           <div className="flex items-center justify-between lg:w-1/2 my-1">
             <span
-              className={`text-lg cursor-pointer rounded-md font-medium ${
-                isOutOfStock ? "text-red-600" : "text-green-700"
-              }`}
+              className={`text-lg cursor-pointer rounded-md font-medium ${isOutOfStock ? "text-red-600" : "text-green-700"
+                }`}
             >
               {isOutOfStock ? "Out of Stock" : "In Stock"}
             </span>
@@ -228,7 +226,7 @@ const AdvancedProductDetail = ({ data }) => {
             </div>
             {!isOutOfStock && (
               <p className="text-white text-xl rounded-lg animate-bounce p-1 px-2 bg-red-500 font-montserrat">
-                -50%
+                -{data.product.discount}%
               </p>
             )}
           </div>
@@ -236,7 +234,7 @@ const AdvancedProductDetail = ({ data }) => {
             <div className="text-gray-500 text-sm m-1">
               <span>M.R.P.: </span>
               <span className="line-through">
-                ${(data.product.prod_value * 2).toLocaleString()}
+                ${data.product.actual_price.toLocaleString()}
               </span>
             </div>
           )}
@@ -254,8 +252,8 @@ const AdvancedProductDetail = ({ data }) => {
                   loading="lazy"
                   src="https://www.thecpapshop.com/media/catalog/badges/CPAP-icons-56x56-16.png"
                   alt="Prescription Required"
-                ></img>
-                <div className="badge-title lg:text-sm sm: text-xs text-center ">
+                />
+                <div className="badge-title lg:text-sm sm: text-xs text-center">
                   Prescription Required
                 </div>
               </div>
@@ -267,8 +265,8 @@ const AdvancedProductDetail = ({ data }) => {
                   loading="lazy"
                   src="https://www.thecpapshop.com/media/catalog/badges/CPAP-icons-56x56-05.png"
                   alt="2 Year Warranty"
-                ></img>{" "}
-                <div className="badge-title lg:text-sm sm: text-xs text-center ">
+                />
+                <div className="badge-title lg:text-sm sm: text-xs text-center">
                   2 Year Warranty
                 </div>
               </div>
@@ -280,8 +278,8 @@ const AdvancedProductDetail = ({ data }) => {
                   loading="lazy"
                   src="https://www.thecpapshop.com/media/catalog/badges/CPAP-icons-56x56-04.png"
                   alt="Free Shipping Over $99"
-                ></img>
-                <div className="badge-title lg:text-sm sm: text-xs text-center ">
+                />
+                <div className="badge-title lg:text-sm sm: text-xs text-center">
                   Free Shipping Over $99
                 </div>
               </div>
@@ -293,8 +291,8 @@ const AdvancedProductDetail = ({ data }) => {
                   loading="lazy"
                   src="https://www.thecpapshop.com/media/catalog/badges/TCSbuynowpayovertime.jpg"
                   alt="Pay Over Time"
-                ></img>{" "}
-                <div className="badge-title lg:text-sm sm: text-xs text-center ">
+                />
+                <div className="badge-title lg:text-sm sm: text-xs text-center">
                   Pay Over Time
                 </div>
               </div>
@@ -320,11 +318,10 @@ const AdvancedProductDetail = ({ data }) => {
             </div>
             <button
               onClick={cartHandler}
-              className={`flex items-center px-4 py-2 rounded-lg ${
-                isOutOfStock
+              className={`flex items-center px-4 py-2 rounded-lg ${isOutOfStock
                   ? "bg-gray-400 cursor-not-allowed"
                   : "bg-customPink text-white hover:bg-customBlue"
-              }`}
+                }`}
               disabled={isOutOfStock}
             >
               <FaShoppingCart className="mr-2" />
@@ -340,9 +337,9 @@ const AdvancedProductDetail = ({ data }) => {
                 {data.product.prod_detailed_desc.map((dtl, i) => (
                   <li key={i}>
                     <p className="my-2 text-xl font-bold ml-2">
-                      {Object.keys(dtl)[1]}
+                      {Object.values(dtl)[1]}
                     </p>
-                    <p>{Object.values(dtl)[1]}</p>
+                    <p>{Object.values(dtl)[2]}</p>
                   </li>
                 ))}
               </ul>
@@ -402,5 +399,5 @@ const AdvancedProductDetail = ({ data }) => {
     </div>
   );
 };
- 
+
 export default AdvancedProductDetail;

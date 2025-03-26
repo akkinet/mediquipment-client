@@ -136,7 +136,7 @@ export default function BorderfreeStyleCheckout() {
 
       const data = await response.json();
       if (data.error) {
-        toast.error(`Failed to fetch rates: ${data.error}`);
+        // toast.error(`Failed to fetch rates: ${data.error}`);
         setShipment(null);
         return;
       }
@@ -144,8 +144,8 @@ export default function BorderfreeStyleCheckout() {
       setShipment(data);
       toast.success("Shipping rates fetched!");
     } catch (error) {
-      toast.error("Error fetching rates: " + error.message);
-      console.error("Error fetching rates:", error);
+      // toast.error("Error fetching rates: " + error.message);
+      // console.error("Error fetching rates:", error);
       setShipment(null);
     } finally {
       setIsFetchingRates(false);

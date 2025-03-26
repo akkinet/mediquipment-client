@@ -28,7 +28,7 @@ const OrderSchema = new mongoose.Schema({
       prescription_file: { type: String, default: "" },
       prescription_required: { type: Boolean, required: true },
       price: { type: Number, required: true },
-      product_id: { type: Number, required: true },
+      product_id: { type: String, required: true },
       product_name: { type: String, required: true },
       quantity: { type: Number, required: true, min: 1 }
     }

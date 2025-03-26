@@ -3,9 +3,9 @@ import Link from "next/link";
 
 const NewArrivals = async () => {
   const urls = [
-    `${process.env.NEXT_PUBLIC_API_URL}/product/1728971851696`,
-    `${process.env.NEXT_PUBLIC_API_URL}/product/1728971862582`,
-    `${process.env.NEXT_PUBLIC_API_URL}/product/1728971859384`,
+    `${process.env.NEXT_PUBLIC_API_URL}/product/67e1389c121b72710a9d756b`,
+    `${process.env.NEXT_PUBLIC_API_URL}/product/67e1389c121b72710a9d756c`,
+    `${process.env.NEXT_PUBLIC_API_URL}/product/67e1389c121b72710a9d756d`,
   ];
 
   const promises = urls.map((url) =>

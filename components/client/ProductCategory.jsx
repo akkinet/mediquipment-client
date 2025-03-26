@@ -7,7 +7,7 @@ import { DataContext } from "./DataContextProvider";
 
 const ProductCategory = ({ prod }) => {
   const [products, setProducts] = useState(prod);
-  const [category, setCategory] = useState("Oxygen Therapy Devices");
+  const [category, setCategory] = useState("Pap Devices");
   const data = useContext(DataContext);
 
   // Track the active category
@@ -15,7 +15,7 @@ const ProductCategory = ({ prod }) => {
 
   const handleCategoryChange = async (cat) => {
     try {
-      const res = await fetcher(`/api/product?category=${cat}&num=6`);
+      const res = await fetcher(`/api/product?category=${cat}&num=2`);
       setCategory(cat);
       setActiveCategory(cat); // Set the active category
       setProducts(res);
@@ -48,77 +48,6 @@ const ProductCategory = ({ prod }) => {
               solutions. Quality you can trust.
             </p>
           </div>
-
-          {/* Category Buttons */}
-          {/* <div className="flex justify-evenly flex-wrap w-[90%] gap-2 px-4">
-            {data?.map((d) => (
-              <div key={d.name} className="button">
-                <button
-                  className={`group relative inline-flex items-center overflow-hidden rounded-full border-2 px-12 py-3 text-lg font-medium 
-                    ${
-                      activeCategory === d.name
-                        ? "border-white text-white bg-customPink" 
-                        : "border-customPink text-customPink hover:bg-gray-50 hover:text-white"
-                    }`}
-                  onClick={() => handleCategoryChange(d.name)}
-                >
-                  <span
-                    className={`duration-400 ease absolute left-0 top-1/2 block h-0 w-full bg-customPink opacity-100 transition-all 
-                      ${
-                        activeCategory === d.name
-                          ? "top-0 h-full" 
-                          : "group-hover:top-0 group-hover:h-full"
-                      }`}
-                  ></span>
-                  <span
-                    className={`ease absolute right-0 flex h-10 w-10 translate-x-full transform items-center justify-start duration-500 
-                      ${activeCategory === d.name ? "-translate-x-2" : "group-hover:-translate-x-2"}`}
-                  >
-                    <svg
-                      className="h-5 w-5"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth="2"
-                        d="M14 5l7 7m0 0l-7 7m7-7H3"
-                      ></path>
-                    </svg>
-                  </span>
-                  <span
-                    className={`relative transform duration-700 ${
-                      activeCategory === d.name ? "-translate-x-3" : "group-hover:-translate-x-3"
-                    }`}
-                  >
-                    {d.name}
-                  </span>
-                </button>
-              </div>
-            ))}
-          </div> */}
-
-          {/* <div className="flex justify-around items-center w-[80%] bg-gray-100 p-2 rounded-lg shadow-md">
-  {data?.map((d) => (
-    <div key={d.name} className="button">
-      <button
-        className={`px-6 py-2 text-lg font-semibold rounded-lg transition-all duration-200 
-          ${
-            activeCategory === d.name
-              ? "bg-blue-500 text-white" // Active button style
-              : "bg-white text-black hover:bg-gray-200" // Default button style
-          }`}
-        onClick={() => handleCategoryChange(d.name)}
-      >
-        {d.name}
-      </button>
-    </div>
-  ))}
-</div> */}
-
 
           {/* Products Section */}
           <section className="text-gray-600 body-font lg:w-[90%]">
