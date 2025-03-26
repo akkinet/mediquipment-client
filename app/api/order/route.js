@@ -89,14 +89,14 @@ export const POST = async (req) => {
       const product = await prodResp.json();
 
       orderParams.items.push({
-        product_id: product.product.prod_id,
+        product_id: product.product._id,
         product_name: product.product.prod_name,
         description: product.product.prod_desc,
         image: product.product.prod_images[0],
         quantity: item.quantity,
         price: (item.amount_total / 100).toFixed(2),
-        prescription_required: product.product.prod_id in presItems || presItems[product.product.prod_id] == "",
-        prescription_file: presItems[product.product.prod_id] ?? "",
+        prescription_required: product.product._id in presItems || presItems[product.product._id] == "",
+        prescription_file: presItems[product.product._id] ?? "",
       });
     }
 

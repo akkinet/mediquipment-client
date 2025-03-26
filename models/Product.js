@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from '../lib/mongodb';
 const Schema = mongoose.Schema;
 
 const ProductSchema = new Schema({
@@ -22,11 +22,6 @@ const ProductSchema = new Schema({
       required: true
     }
   }],
-  prod_id: {
-    type: String,
-    required: true,
-    unique: true
-  },
   isFeatured: {
     type: Boolean,
     default: false
@@ -90,9 +85,9 @@ const ProductSchema = new Schema({
 
 // Virtual field for discount calculation
 ProductSchema.virtual('discount').get(function () {
-  const msrp = this.price.actual_price;
+  const msrp = this.actual_price;
   // const effectivePrice = this.price.OurSalesPrice !== null ? this.price.OurSalesPrice : this.price.MAP;
-  const effectivePrice = this.price.prod_value;
+  const effectivePrice = this.prod_value;
   
   if (!msrp || !effectivePrice || msrp <= effectivePrice) {
     return 0; 
@@ -102,6 +97,6 @@ ProductSchema.virtual('discount').get(function () {
   return Number(discount.toFixed(2)); 
 });
 
-const RealProduct = mongoose.model('RealProduct', ProductSchema);
+const Product = mongoose.models.RealProducts || mongoose.model('RealProducts', ProductSchema, "RealProducts");
 
-export default RealProduct;
+export default Product;

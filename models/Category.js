@@ -4,8 +4,8 @@ const categorySchema = new mongoose.Schema({
   name: String,
   image: String
 }, {
-  collection: "Categories"
+  collection: "RealCategory"
 })
 
-const Category = mongoose.models.Category || mongoose.model("Category", categorySchema);
+const Category = mongoose.models.RealCategory || mongoose.model("RealCategory", categorySchema);
 export default Category;

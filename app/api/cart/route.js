@@ -9,7 +9,7 @@ export const POST = async (req) => {
       prod_value,
       quantity,
       prod_name,
-      prod_id,
+      _id,
       prod_desc,
       email,
     } = await req.json();
@@ -21,7 +21,7 @@ export const POST = async (req) => {
       description: prod_desc,
       price: prod_value,
       title: prod_name,
-      product_id: prod_id,
+      product_id: _id,
     };
 
     const result = await Cart.findOneAndUpdate(

@@ -24,8 +24,12 @@ export const GET = async (req) => {
 
     if (price) {
       const parsedPrice = JSON.parse(price);
-      console.log("parsedPrice", parsedPrice, typeof(Object.values(parsedPrice)[0]));
- 
+      console.log(
+        "parsedPrice",
+        parsedPrice,
+        typeof Object.values(parsedPrice)[0]
+      );
+
       filter.prod_value = parsedPrice; // Assuming price is a single number
     }
 
@@ -42,9 +46,9 @@ export const GET = async (req) => {
       filter.prod_name = { $regex: new RegExp(capitalize(query), "i") }; // Case-insensitive search
     }
 
-    console.log("filter", filter);
-    const productList = await Product.find(filter)
-      .limit(num ? parseInt(num) : 0);
+    const productList = await Product.find(filter).limit(
+      num ? parseInt(num) : 0
+    );
 
     return NextResponse.json(productList, { status: 200 });
   } catch (error) {
