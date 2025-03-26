@@ -37,7 +37,7 @@ export const POST = async (req) => {
 
     const orderParams = {
       checkout_session: body.sessionID,
-      // shipping_rate: checkout_session.metadata.shipping_rate,
+      shipping_rate: checkout_session.metadata.shipping_rate,
       // carrier: trans.carrier,
       // tracking_number: trans.tracking_number,
       total_amount: checkout_session.amount_total,

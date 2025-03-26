@@ -348,7 +348,7 @@ const AdvancedProductDetail = ({ data }) => {
               </ul>
             </div>
           </div>
-          <p className="text-customBlue text-right border-t-2 border-gray-300">
+          <p className="text-customBlue text-right border-t-2 pt-2 border-gray-300">
             Sold by:{" "}
             <span className="text-black">{data.product.vendor_name}</span>
           </p>
